@@ -37,9 +37,15 @@ android {
     productFlavors {
         api16 {
             minSdkVersion 16
+            versionNameSuffix "-api16"
         }
         api21 {
             minSdkVersion 21
+            versionNameSuffix "-api21"
+        }
+        api25 {
+            minSdkVersion 25
+            versionNameSuffix "-api25"
         }
     }
 }
@@ -51,5 +57,6 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'com.google.code.gson:gson:2.4'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     testCompile 'junit:junit:4.12'
 }

@@ -17,3 +17,6 @@
 #}
 
 -keep class tinkoff.androidcourse.Response { *; }
+
+# Rules from https://github.com/square/picasso
+-dontwarn com.squareup.okhttp.**
