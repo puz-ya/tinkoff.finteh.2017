@@ -1,69 +1,55 @@
 apply plugin: 'com.android.application'
 
 android {
-
-    signingConfigs{
-        release {
-            // keyAlias ''
-            // keyPassword ''
-            // Android/keystones/...
-            // storeFile file('../cert/BlaBla.jks')
-            // storePassword('')
-        }
-    }
-
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "com.puzino.chat"
-        minSdkVersion 16
+        applicationId "tinkoff.androidcourse"
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-
-    //this suffix will be 2 (second)
-    //type of our build (sdk, modules)
+    signingConfigs {
+        release {
+            keyAlias 'BlaBla'
+            keyPassword '123456'
+            storeFile file('../cert/tcsSchool.jks')
+            storePassword '123456'
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
         debug {
             applicationIdSuffix ".debug"
         }
-        myNewBuildType {
-            minifyEnabled true
-            zipAlignEnabled true
+        prodDebug {
+            initWith debug
+            applicationIdSuffix ".prodDebug"
         }
     }
-
-    //this suffix will be 1 (first)
-    //type of our product (free\paid)
     productFlavors {
-
         api16 {
             minSdkVersion 16
-            applicationIdSuffix ".api16"
-            versionNameSuffix "-api16"
         }
-        api22 {
-            minSdkVersion 22
-            versionNameSuffix '-api22'
+        api21 {
+            minSdkVersion 21
         }
     }
 }
 
 dependencies {
-    //can add new modules
-    //compile project ('name_of_module')
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.2.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.1'
+    compile 'com.google.code.gson:gson:2.4'
     testCompile 'junit:junit:4.12'
 }

@@ -1,8 +1,10 @@
-# Finteh School.
+# Android Course #
 
-Modules: none (yet).
+Тинькофф курсы по Android 2017
 
-## Screenshots:
-None (yet).
 
-<img src="#" height="200px" alt="" title="" />
+Репозиторий содержит ветки:
+
+* lesson<X> — коммиты по уроку X
+
+* dev — текущая версия проекта
