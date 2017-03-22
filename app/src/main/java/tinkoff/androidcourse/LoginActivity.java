@@ -13,6 +13,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText password;
     private Button button;
 
+    private static final String EXTRA_LOGIN = "LOGIN";
+    private static final String EXTRA_PASSW = "PASSWORD";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -34,7 +37,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private void startNextScreen() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("LOGIN", login.getText().toString());
+        intent.putExtra(EXTRA_LOGIN, login.getText().toString());
+        intent.putExtra(EXTRA_PASSW, password.getText().toString());
         startActivity(intent);
     }
 }
