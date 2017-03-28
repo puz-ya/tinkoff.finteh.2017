@@ -5,11 +5,13 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/** Show list of messages in selected chat group */
 public class ChatActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -19,6 +21,9 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_chat);
+        setSupportActionBar(toolbar);
 
         initRecyclerChatView();
     }
