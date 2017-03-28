@@ -5,8 +5,9 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="tinkoff.androidcourse.MainActivity">
+    tools:context="tinkoff.androidcourse.DialogFragment">
 
+    <!--
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,6 +21,7 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
+    -->
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_dialogs"
