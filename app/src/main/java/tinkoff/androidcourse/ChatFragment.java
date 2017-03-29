@@ -1,37 +1,57 @@
 package tinkoff.androidcourse;
 
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.widget.Toast;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /** Show list of messages in selected chat group */
-public class ChatActivity extends AppCompatActivity {
+public class ChatFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
 
+    public static String ARG_POSITION = "ChatID";
+
+    public ChatFragment(){}
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_chat);
-        setSupportActionBar(toolbar);
-
-        initRecyclerChatView();
+        if (getArguments() != null) {
+            //title = getArguments().getString(ARG_TITLE);
+        }
     }
 
-    private void initRecyclerChatView() {
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view_chat);
+    public static ChatFragment newInstance(String title) {
+        ChatFragment fragment = new ChatFragment();
+        Bundle args = new Bundle();
+        //args.putString(ARG_POSITION, title);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        //TextView textViewTitle = (TextView) view.findViewById(R.id.text_view_stub);
+        //textViewTitle.setText(title);
+
+        initRecyclerChatView(view);
+
+        return view;
+    }
+
+    private void initRecyclerChatView(View view) {
+        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_chat);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         //setting chat from bottom
         layoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(layoutManager);
@@ -39,7 +59,7 @@ public class ChatActivity extends AppCompatActivity {
         adapter = new ChatAdapter(createDataset(), new OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Toast.makeText(ChatActivity.this, "message = " + position, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ChatFragment.this, "message = " + position, Toast.LENGTH_SHORT).show();
             }
         });
         recyclerView.setAdapter(adapter);

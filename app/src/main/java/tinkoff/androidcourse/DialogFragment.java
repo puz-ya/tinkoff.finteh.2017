@@ -1,19 +1,16 @@
 package tinkoff.androidcourse;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -24,6 +21,8 @@ public class DialogFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
+
+    OnLoadChat mCallback;
 
     private static final String EXTRA_ID = "CHAT_ID";
 
@@ -68,7 +67,7 @@ public class DialogFragment extends Fragment {
             @Override
             public void onItemClick(int position) {
                 Toast.makeText(getActivity(), "position = " + position, Toast.LENGTH_SHORT).show();
-                startChatScreen(adapter.getItemId(position));
+                mCallback.startChatScreen(adapter.getItemId(position));
             }
         });
         recyclerView.setAdapter(adapter);
@@ -88,9 +87,28 @@ public class DialogFragment extends Fragment {
         return list;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mCallback = (OnLoadChat) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnLoadChat");
+        }
+    }
+
+    /*
     private void startChatScreen(long pos) {
-        Intent intent = new Intent(getActivity(), ChatActivity.class);
+        Intent intent = new Intent(getActivity(), ChatFragment.class);
         intent.putExtra(EXTRA_ID, pos);
         startActivity(intent);
+    } */
+
+    public interface OnLoadChat{
+        void startChatScreen(long position);
     }
 }
