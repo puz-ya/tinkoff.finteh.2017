@@ -36,22 +36,8 @@ public class NavigationActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
             return;
         }
-
-        if (getSupportFragmentManager().findFragmentByTag("chatFragmentTag") != null) {
-            //getSupportFragmentManager().popBackStackImmediate("navigationFragmentTag", 0);
-            if(!getSupportFragmentManager().findFragmentByTag("chatFragmentTag").isVisible()){
-                return;
-            }
-            getSupportFragmentManager().popBackStack();
-            return;
-        }
-
-        if(getSupportFragmentManager().findFragmentByTag("navigationFragmentTag") != null){
-            return;
-        }
-
+        
         super.onBackPressed();
-
     }
 
     @Override
@@ -75,6 +61,8 @@ public class NavigationActivity extends AppCompatActivity
                 break;
             case R.id.nav_exit:
                 finish();
+                break;
+            default:
                 break;
         }
 
@@ -100,7 +88,12 @@ public class NavigationActivity extends AppCompatActivity
 
         if (savedInstanceState == null) {
             navigationView.getMenu().getItem(MENU_DIALOGS).setChecked(true);
-            onNavigationItemSelected(navigationView.getMenu().getItem(MENU_DIALOGS));
+            //otherwise it will show empty screen after BACK button press
+            //onNavigationItemSelected(navigationView.getMenu().getItem(MENU_DIALOGS));
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_left, R.anim.exit_right);
+            fragmentTransaction = fragmentTransaction.replace(R.id.content_navigation, DialogFragment.newInstance(""), "navigationFragmentTag");
+            fragmentTransaction.commit();
         }
 
         mSharedPreferences = getApplicationContext()
@@ -133,37 +126,10 @@ public class NavigationActivity extends AppCompatActivity
     /** fragment replacement with animation */
     private void addFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.enter_left, R.anim.exit_right, R.anim.enter_right, R.anim.exit_left);
+        fragmentTransaction.setCustomAnimations(R.anim.enter_left, R.anim.exit_right);
         fragmentTransaction = fragmentTransaction.replace(R.id.content_navigation, fragment, "navigationFragmentTag");
-        //fragmentTransaction.addToBackStack("navigationFragmentTag");
+        fragmentTransaction.addToBackStack("navigationFragmentTag");
         fragmentTransaction.commit();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        final int id = item.getItemId();
-
-        switch (id) {
-            case R.id.menu_about:
-                addFragment(AboutFragment.newInstance(""));
-                break;
-
-            //just finish app
-            case R.id.menu_exit:
-                finish();
-                break;
-
-            default:
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /** erase previous login values */
@@ -196,5 +162,4 @@ public class NavigationActivity extends AppCompatActivity
         fragmentTransaction.addToBackStack("showChat");
         fragmentTransaction.commit();
     }
-
 }
