@@ -126,7 +126,7 @@ public class NavigationActivity extends AppCompatActivity
     /** fragment replacement with animation */
     private void addFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.enter_left, R.anim.exit_right);
+        fragmentTransaction.setCustomAnimations(R.anim.enter_left, R.anim.exit_right, R.anim.enter_right, R.anim.exit_left);
         fragmentTransaction = fragmentTransaction.replace(R.id.content_navigation, fragment, "navigationFragmentTag");
         fragmentTransaction.addToBackStack("navigationFragmentTag");
         fragmentTransaction.commit();
@@ -157,7 +157,7 @@ public class NavigationActivity extends AppCompatActivity
 
         //need to addToBackStack to return to Dialogs
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
         fragmentTransaction = fragmentTransaction.replace(R.id.content_navigation, chatFragment, "chatFragmentTag");
         fragmentTransaction.addToBackStack("showChat");
         fragmentTransaction.commit();

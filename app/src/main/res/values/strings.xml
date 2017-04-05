@@ -6,7 +6,7 @@
     <!-- Login Activity -->
     <string name="edit_login_hint">Insert login...</string>
     <string name="edit_pass_hint">Insert password...</string>
-    <string name="button_login">Login!</string>
+    <string name="enter">Login!</string>
 
     <!-- Menu -->
     <string name="menu_dialogs">Dialogs</string>
