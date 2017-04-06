@@ -1,8 +1,11 @@
 package tinkoff.androidcourse;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
@@ -29,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                task.execute();
+                new LoginTask().execute();
             }
         });
     }
@@ -40,7 +43,28 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private class LoginTask extends AsyncTask<Void, Void, Void> {
+    public static class MyDialogFragment extends DialogFragment {
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            Dialog dialog = super.onCreateDialog(savedInstanceState);
+            dialog.setTitle("У тебя проблемы");
+            return dialog;
+        }
+    }
+
+    private class LoginTask extends AsyncTask<String[], Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String[]... credentials) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -48,19 +72,13 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(Boolean success) {
             button.hideProgress();
-            startNextScreen();
+            if (success) {
+                startNextScreen();
+            } else {
+                new MyDialogFragment().show(getSupportFragmentManager(), null);
+            }
         }
     }
 }
