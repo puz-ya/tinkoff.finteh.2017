@@ -1,6 +1,7 @@
 package tinkoff.androidcourse;
 
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,9 +11,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import tinkoff.androidcourse.ui.widgets.LoginService;
 import tinkoff.androidcourse.ui.widgets.ProgressButton;
 
 public class LoginActivity extends AppCompatActivity {
+
+    public static final String PENDING_INTENT = "pi";
+    public static final String EXTRA_SUCCESS = "extra_success";
+    public static final String CREDENTIALS = "credentials";
+    public static final int LOGIN_REQUEST_CODE = 1;
 
     private EditText login;
     private EditText password;
@@ -39,13 +46,28 @@ public class LoginActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new LoginTask(LoginActivity.this).execute();
+                Intent data = new Intent().putExtra(CREDENTIALS, new String[]{});
+                PendingIntent pi = createPendingResult(LOGIN_REQUEST_CODE, data, 0);
+                startService(new Intent(LoginActivity.this, LoginService.class).putExtra(PENDING_INTENT, pi));
             }
         });
     }
 
     public void showProgress() {
         button.showProgress();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == LOGIN_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Log.i("LoginActivity", "onActivityResultC " + toString());
+                startNextScreen();
+            } else {
+                new LoginActivity.MyDialogFragment().show(this.getSupportFragmentManager(), null);
+            }
+        }
     }
 
     public void hideProgress() {
