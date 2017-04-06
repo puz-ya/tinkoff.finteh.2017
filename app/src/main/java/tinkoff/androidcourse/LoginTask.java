@@ -10,10 +10,10 @@ import java.lang.ref.WeakReference;
  */
 class LoginTask extends AsyncTask<String[], Void, Boolean> {
 
-    private WeakReference<LoginActivity> loginActivity;
+    private WeakReference<LoginFragment> loginFragment;
 
-    public LoginTask(LoginActivity loginActivity) {
-        this.loginActivity = new WeakReference<>(loginActivity);
+    public LoginTask(LoginFragment loginFragment) {
+        this.loginFragment = new WeakReference<>(loginFragment);
     }
 
     @Override
@@ -28,19 +28,20 @@ class LoginTask extends AsyncTask<String[], Void, Boolean> {
 
     @Override
     protected void onPreExecute() {
-        loginActivity.get().showProgress();
+//        loginFragment.get().showProgress();
     }
 
     @Override
     protected void onPostExecute(Boolean success) {
-        LoginActivity loginActivity = this.loginActivity.get();
-        if (loginActivity != null) {
-            Log.i("LoginTask", "onPostExecute " + loginActivity.toString());
-            loginActivity.hideProgress();
+        LoginFragment loginFragment = this.loginFragment.get();
+        loginFragment.setSuccess(success);
+        if (loginFragment != null) {
+            Log.i("LoginTask", "onPostExecute " + loginFragment.toString());
+//            loginFragment.hideProgress();
             if (success) {
-                loginActivity.startNextScreen();
+//                loginFragment.startNextScreen();
             } else {
-                new LoginActivity.MyDialogFragment().show(loginActivity.getSupportFragmentManager(), null);
+//                new LoginActivity.MyDialogFragment().show(loginFragment.getSupportFragmentManager(), null);
             }
         }
     }
