@@ -119,6 +119,7 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
     void startNextScreen() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("LOGIN", login.getText().toString());
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 
