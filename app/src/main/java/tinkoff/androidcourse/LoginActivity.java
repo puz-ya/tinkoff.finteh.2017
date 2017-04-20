@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import tinkoff.androidcourse.model.PrefManager;
 import tinkoff.androidcourse.ui.widgets.ProgressButton;
 
 public class LoginActivity extends AppCompatActivity implements LoginFragment.LoginListener {
@@ -27,6 +28,16 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
     private LoginFragment loginFragment;
 
     @Override
+    public void onResult(Boolean success) {
+        if (success) {
+            startNextScreen();
+        } else {
+            hideProgress();
+            new LoginActivity.MyDialogFragment().show(getSupportFragmentManager(), null);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i("LoginActivity", "onCreate " + toString());
@@ -35,67 +46,26 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
         login = (EditText) findViewById(R.id.edit_text_login);
         password = (EditText) findViewById(R.id.edit_text_password);
         button = (ProgressButton) findViewById(R.id.btn_enter);
-
+        login.setText(PrefManager.login(this));
         if (savedInstanceState != null) {
             FragmentManager supportFragmentManager = getSupportFragmentManager();
             loginFragment = (LoginFragment) supportFragmentManager.findFragmentByTag(LoginFragment.TAG);
             if (loginFragment != null) {
 
             } else {
-                loginFragment = new LoginFragment();
-                supportFragmentManager.beginTransaction().add(loginFragment, LoginFragment.TAG).commit();
+                createLoginFragment(supportFragmentManager);
             }
+        } else {
+            createLoginFragment(getSupportFragmentManager());
         }
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showProgress();
-                new LoginTask(loginFragment).execute();
+                new LoginTask(loginFragment).execute(new String[]{login.getText().toString()});
             }
         });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.i("LoginActivity", "onStart " + toString());
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.i("LoginActivity", "onStop " + toString());
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.i("LoginActivity", "onDestroy " + toString());
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.i("LoginActivity", "onSaveInstanceState" + toString());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.i("LoginActivity", "onPause" + toString());
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i("LoginActivity", "onResume" + toString());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        Log.i("LoginActivity", "onRestoreInstanceState" + toString());
     }
 
     public void showProgress() {
@@ -106,21 +76,16 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
         button.hideProgress();
     }
 
-    @Override
-    public void onResult(Boolean success) {
-        if (success) {
-            startNextScreen();
-        } else {
-            hideProgress();
-            new LoginActivity.MyDialogFragment().show(getSupportFragmentManager(), null);
-        }
-    }
-
     void startNextScreen() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("LOGIN", login.getText().toString());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+    }
+
+    private void createLoginFragment(FragmentManager supportFragmentManager) {
+        loginFragment = new LoginFragment();
+        supportFragmentManager.beginTransaction().add(loginFragment, LoginFragment.TAG).commit();
     }
 
     public static class MyDialogFragment extends DialogFragment {
