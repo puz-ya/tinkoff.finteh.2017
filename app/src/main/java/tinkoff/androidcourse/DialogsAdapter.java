@@ -9,6 +9,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import tinkoff.androidcourse.model.db.DialogItem;
+
 public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHolder> {
 
     private List<DialogItem> dataset;
@@ -42,7 +44,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
         notifyItemInserted(dataset.size());
     }
 
-    public void setItems(ArrayList<DialogItem> dialogItems) {
+    public void setItems(List<DialogItem> dialogItems) {
         dataset = dialogItems;
         notifyDataSetChanged();
     }
