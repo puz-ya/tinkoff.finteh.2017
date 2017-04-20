@@ -16,6 +16,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import tinkoff.androidcourse.model.db.DialogItem;
+
 /** Show list of chat groups */
 public class DialogFragment extends Fragment {
 

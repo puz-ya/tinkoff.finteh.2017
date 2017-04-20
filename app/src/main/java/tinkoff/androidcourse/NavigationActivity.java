@@ -98,6 +98,7 @@ public class NavigationActivity extends AppCompatActivity
             fragmentTransaction.commit();
         }
 
+        /*
         mSharedPreferences = getApplicationContext()
                 .getSharedPreferences(LoginActivity.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
 
@@ -115,6 +116,7 @@ public class NavigationActivity extends AppCompatActivity
         View header = navigationView.getHeaderView(0);
         TextView text = (TextView) header.findViewById(R.id.textView);
         text.setText(sLogin);
+        */
     }
 
     @Override
@@ -137,11 +139,13 @@ public class NavigationActivity extends AppCompatActivity
     /** erase previous login values */
     private void logOut(){
 
+        /*
         mSharedPreferences
                 .edit()
                 .putString(LoginActivity.EXTRA_LOGIN, "")
                 .putString(LoginActivity.EXTRA_PASSW, "")
                 .apply();
+                */
 
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
