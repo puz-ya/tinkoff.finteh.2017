@@ -17,7 +17,7 @@ class LoginTask extends AsyncTask<String[], Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(String[]... credentials) {
-        PrefManager.saveLogin(loginFragment.getContext(), credentials[0][0]);
+        PrefManager.getInstance().saveLogin(credentials[0][0]);
         return true;
     }
 
