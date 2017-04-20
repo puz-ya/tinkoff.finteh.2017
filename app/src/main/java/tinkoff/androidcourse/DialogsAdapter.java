@@ -6,7 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import tinkoff.androidcourse.model.db.DialogItem;
 
 public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHolder> {
 
@@ -26,13 +29,24 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.title.setText(dataset.get(position).getTitle());
-        holder.desc.setText(dataset.get(position).getDesc());
+        DialogItem dialogItem = dataset.get(position);
+        holder.title.setText(dialogItem.getTitle());
+        holder.desc.setText(dialogItem.getDesc());
     }
 
     @Override
     public int getItemCount() {
         return dataset.size();
+    }
+
+    public void addDialog(DialogItem dialogItem) {
+        dataset.add(dialogItem);
+        notifyItemInserted(dataset.size());
+    }
+
+    public void setItems(List<DialogItem> dialogItems) {
+        dataset = dialogItems;
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
