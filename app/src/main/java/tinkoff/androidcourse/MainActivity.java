@@ -1,8 +1,10 @@
 package tinkoff.androidcourse;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,20 +31,50 @@ public class MainActivity extends AppCompatActivity {
         writableDatabase = App.getDbhelper().getWritableDatabase();
         setContentView(R.layout.activity_main);
         initRecyclerView();
+        ArrayList<DialogItem> dialogItems = getPreviousDialogItems();
+        adapter.setItems(dialogItems);
         addDialog = (Button) findViewById(R.id.add_dialog);
         addDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int itemCount = adapter.getItemCount();
-                DialogItem dialogItem = new DialogItem("Title is " + itemCount, "Description is " + itemCount);
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(DbContract.DialogEntry.COLUMN_TITLE, dialogItem.getTitle());
-                contentValues.put(DbContract.DialogEntry.COLUMN_DESCRIPTION, dialogItem.getTitle());
-                contentValues.put(DbContract.DialogEntry.COLUMN_TIMESTAMP, new Date().getTime());
-                writableDatabase.insert(DbContract.DialogEntry.TABLE_NAME, null, contentValues);
-                adapter.addDialog(dialogItem);
+                addDialogItem();
             }
         });
+    }
+
+    private void addDialogItem() {
+        int itemCount = adapter.getItemCount();
+        DialogItem dialogItem = new DialogItem("Title is " + itemCount, "Description is " + itemCount);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DbContract.DialogEntry.COLUMN_TITLE, dialogItem.getTitle());
+        contentValues.put(DbContract.DialogEntry.COLUMN_DESCRIPTION, dialogItem.getTitle());
+        contentValues.put(DbContract.DialogEntry.COLUMN_TIMESTAMP, new Date().getTime());
+        writableDatabase.insert(DbContract.DialogEntry.TABLE_NAME, null, contentValues);
+        adapter.addDialog(dialogItem);
+    }
+
+    @NonNull
+    private ArrayList<DialogItem> getPreviousDialogItems() {
+        Cursor cursor = writableDatabase.query(DbContract.DialogEntry.TABLE_NAME,
+                new String[]{
+                        DbContract.DialogEntry.COLUMN_TITLE,
+                        DbContract.DialogEntry.COLUMN_DESCRIPTION
+                },
+                null,
+                null,
+                null,
+                null,
+                null);
+        ArrayList<DialogItem> dialogItems = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            int titleIndex = cursor.getColumnIndex(DbContract.DialogEntry.COLUMN_TITLE);
+            int descriptionIndex = cursor.getColumnIndex(DbContract.DialogEntry.COLUMN_DESCRIPTION);
+            String title = cursor.getString(titleIndex);
+            String description = cursor.getString(descriptionIndex);
+            dialogItems.add(new DialogItem(title, description));
+        }
+        cursor.close();
+        return dialogItems;
     }
 
     private void initRecyclerView() {
