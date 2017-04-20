@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import tinkoff.androidcourse.ui.widgets.ProgressButton;
 
@@ -53,7 +54,12 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
                 loginFragment = new LoginFragment();
                 supportFragmentManager.beginTransaction().add(loginFragment, LoginFragment.TAG).commit();
             }
+        }else{
+            loginFragment = new LoginFragment();
+            FragmentManager supportFragmentManager = getSupportFragmentManager();
+            supportFragmentManager.beginTransaction().add(loginFragment, LoginFragment.TAG).commit();
         }
+
 
         mSharedPreferences = getApplicationContext()
                 .getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);
@@ -131,6 +137,24 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
 
     @Override
     public void onResult(Boolean success) {
+
+        String log = login.getText().toString(),
+                pas = password.getText().toString();
+
+        //check if not empty
+        if(log.isEmpty() || pas.isEmpty()){
+            Toast.makeText(this, "You need to enter something...", Toast.LENGTH_LONG).show();
+        }else {
+            //save login+pass pair in settings and send them to NavigationActivity too (for now)
+            mSharedPreferences
+                    .edit()
+                    .putString(EXTRA_LOGIN, log)
+                    .putString(EXTRA_PASSW, pas)
+                    .apply();
+
+            success = true;
+        }
+
         if (success) {
             startNextScreen();
         } else {
