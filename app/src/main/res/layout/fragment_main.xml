@@ -28,4 +28,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical" />
+
+    <Button
+        android:id="@+id/add_dialog"
+        android:layout_alignParentBottom="true"
+        android:text="Добавить"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </RelativeLayout>
