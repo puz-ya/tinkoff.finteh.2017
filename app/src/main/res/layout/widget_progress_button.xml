@@ -9,7 +9,7 @@
         android:id="@+id/view_background"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="@drawable/selector_button_yellow" />
+        android:background="@drawable/selector_button_green" />
 
     <TextView
         android:id="@+id/text_view"

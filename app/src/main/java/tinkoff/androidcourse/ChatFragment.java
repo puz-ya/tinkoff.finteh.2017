@@ -7,15 +7,20 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import tinkoff.androidcourse.ui.widgets.SendMessageView;
 
 /** Show list of messages in selected chat group */
 public class ChatFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
+
+    //private
 
     public static String ARG_POSITION = "ChatID";
 
@@ -40,12 +45,18 @@ public class ChatFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
-        //TextView textViewTitle = (TextView) view.findViewById(R.id.text_view_stub);
-        //textViewTitle.setText(title);
 
         initRecyclerChatView(view);
+        initSendMessageView(view);
 
         return view;
+    }
+
+    private void initSendMessageView(View view) {
+        SendMessageView sView = (SendMessageView) view.findViewById(R.id.send_message_view);
+        Button button = (Button) view.findViewById(R.id.chat_button_send);
+
+        //set click listener
     }
 
     private void initRecyclerChatView(View view) {

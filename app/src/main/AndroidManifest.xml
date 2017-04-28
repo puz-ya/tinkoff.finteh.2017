@@ -3,8 +3,8 @@
     package="tinkoff.androidcourse">
 
     <application
-        android:allowBackup="true"
         android:name=".App"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -20,22 +20,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.TransitionActivity" />
-        <activity android:name=".ui.activities.AnimationActivity" />
         <activity
             android:name=".LoginActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <!--<intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter> -->
-        </activity>
+        <service android:name=".ui.widgets.LoginService" />
+
         <activity
             android:name=".NavigationActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
-        <service android:name=".ui.widgets.LoginService" />
+        <activity android:name=".ui.activities.TransitionActivity" />
+        <activity android:name=".ui.activities.AnimationActivity" />
+        <activity android:name=".DialogAddActivity"></activity>
     </application>
 
 </manifest>

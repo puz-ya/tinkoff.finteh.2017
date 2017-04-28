@@ -1,6 +1,5 @@
 package tinkoff.androidcourse;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,6 +22,8 @@ import java.util.List;
 
 import tinkoff.androidcourse.model.db.DialogItem;
 
+import static android.app.Activity.RESULT_OK;
+
 /** Show list of chat groups */
 public class DialogFragment extends Fragment {
 
@@ -33,6 +34,7 @@ public class DialogFragment extends Fragment {
     OnLoadChat mCallback;
 
     private static final String EXTRA_ID = "CHAT_ID";
+    private static final int REQUEST_CODE_ADD_DIALOG = 55;
 
     public DialogFragment(){
 
@@ -90,31 +92,41 @@ public class DialogFragment extends Fragment {
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
+    /** Start DialogAddActivity with "Compound View" to retrieve Title & Description of the new Dialog
+     * */
     private void addDialogItem() {
-        int itemCount = adapter.getItemCount();
-        DialogItem dialogItem = new DialogItem("Title is " + itemCount, "Description is " + itemCount);
-        FlowManager.getModelAdapter(DialogItem.class).save(dialogItem);
-        adapter.addDialog(dialogItem);
+
+        Intent intent = new Intent(getActivity(), DialogAddActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_ADD_DIALOG);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Check which request we're responding to
+        if (requestCode == REQUEST_CODE_ADD_DIALOG) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                List<String> strings = new ArrayList<>();
+                if(data.hasExtra("DIALOG_TITLE") && data.hasExtra("DIALOG_DESCRIPT")) {
+                    strings.add(data.getStringExtra("DIALOG_TITLE"));
+                    strings.add(data.getStringExtra("DIALOG_DESCRIPT"));
+                }else{
+                    strings.add("NONE");
+                    strings.add("NONE");
+                }
+
+                DialogItem dialogItem = new DialogItem("Title is " + strings.get(0), "Description is " + strings.get(1));
+                FlowManager.getModelAdapter(DialogItem.class).save(dialogItem);
+                adapter.addDialog(dialogItem);
+            }
+        }
     }
 
     @NonNull
     private List<DialogItem> getPreviousDialogItems() {
         return SQLite.select().from(DialogItem.class).queryList();
     }
-
-    /*
-    private List<DialogItem> createDataset() {
-        List<DialogItem> list = new ArrayList<>();
-        list.add(new DialogItem("Dialog1", "desc1"));
-        list.add(new DialogItem("Dialog2", "desc"));
-        list.add(new DialogItem("Dialog3", "desc3"));
-        list.add(new DialogItem("Dialog4", "desc"));
-        list.add(new DialogItem("Dialog5", "desc"));
-        list.add(new DialogItem("Dialog6", "desc"));
-        list.add(new DialogItem("Dialog7", "desc7"));
-        return list;
-    }
-    //*/
 
     @Override
     public void onAttach(Context context) {
@@ -126,18 +138,12 @@ public class DialogFragment extends Fragment {
             mCallback = (OnLoadChat) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement OnLoadChat");
+                    + " must implement all interfaces!");
         }
     }
-
-    /*
-    private void startChatScreen(long pos) {
-        Intent intent = new Intent(getActivity(), ChatFragment.class);
-        intent.putExtra(EXTRA_ID, pos);
-        startActivity(intent);
-    } */
 
     public interface OnLoadChat{
         void startChatScreen(long position);
     }
+
 }

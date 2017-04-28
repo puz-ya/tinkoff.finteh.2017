@@ -21,14 +21,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.List;
+
 public class NavigationActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, DialogFragment.OnLoadChat {
+        implements NavigationView.OnNavigationItemSelectedListener,
+                DialogFragment.OnLoadChat {
 
     private final static int MENU_DIALOGS = 0;
     private ActionBarDrawerToggle toggle;
     private Toolbar mToolbar;
-
-    private SharedPreferences mSharedPreferences;
 
     @Override
     public void onBackPressed() {
@@ -161,11 +162,17 @@ public class NavigationActivity extends AppCompatActivity
         ChatFragment chatFragment = new ChatFragment();
         chatFragment.setArguments(bundle);
 
-        //need to addToBackStack to return to Dialogs
+        //addToBackStack to correctly return to Dialogs
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
         fragmentTransaction = fragmentTransaction.replace(R.id.content_navigation, chatFragment, "chatFragmentTag");
         fragmentTransaction.addToBackStack("showChat");
         fragmentTransaction.commit();
+    }
+
+    /** Activity DialogAdd will send the result back to Fragment through NavigationActivity */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

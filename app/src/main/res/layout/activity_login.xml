@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/edit_login_hint"
         android:maxLines="1"
+        android:inputType="textPersonName"
         />
 
     <EditText

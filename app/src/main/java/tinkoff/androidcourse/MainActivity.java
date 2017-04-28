@@ -28,7 +28,7 @@ import tinkoff.androidcourse.ui.activities.AnimationActivity;
 public class MainActivity extends AppCompatActivity {
 
     /** Waiting... **/
-    private final int SPLASH_DISPLAY_LENGTH = 3000;
+    private final int SPLASH_DISPLAY_LENGTH = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

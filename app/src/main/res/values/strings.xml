@@ -19,6 +19,14 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <!-- Settings -->
     <string name="settings_fragment_text">Settings fragment (blank)</string>
+
+    <!-- Chat -->
+    <string name="chat_send_message_edittext_hint">Start typing!</string>
+    <string name="chat_send_message_button">Send!</string>
+
+    <!-- About -->
+    <string name="about_logo_descr">Y.P. logo for this app</string>
 
 </resources>
