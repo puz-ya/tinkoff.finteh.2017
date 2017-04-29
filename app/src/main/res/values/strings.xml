@@ -36,5 +36,6 @@
 
     <!-- About -->
     <string name="about_logo_descr">Y.P. logo for this app</string>
+    <string name="button_go">Start transition!</string>
 
 </resources>

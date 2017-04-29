@@ -123,7 +123,8 @@ public class DialogFragment extends Fragment {
 
     @NonNull
     private List<DialogItem> getPreviousDialogItems() {
-        return SQLite.select().from(DialogItem.class).queryList();
+        List<DialogItem> itemList = SQLite.select().from(DialogItem.class).queryList();
+        return itemList;
     }
 
     @Override

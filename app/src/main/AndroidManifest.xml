@@ -29,8 +29,6 @@
         <activity
             android:name=".NavigationActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.activities.TransitionActivity" />
-        <activity android:name=".ui.activities.AnimationActivity" />
         <activity android:name=".DialogAddActivity"></activity>
     </application>
 

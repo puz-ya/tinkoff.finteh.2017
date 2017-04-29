@@ -15,6 +15,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         PrefManager.newInstance(this);
-        FlowManager.init(this);
+        FlowManager.init(this); //init DBFlow (raizlabs)
     }
 }

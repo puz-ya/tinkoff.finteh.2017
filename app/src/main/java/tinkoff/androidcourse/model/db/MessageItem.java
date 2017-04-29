@@ -9,80 +9,71 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+/**
+ * @author Puzino Yury
+ */
+
 @Table(database = FintechChatDatabase.class)
-public class DialogItem {
+public class MessageItem {
 
     @PrimaryKey(autoincrement = true)
     long id;
 
     @Column
-    String title;
+    String text;
 
     @Column
-    String desc;
+    long id_author;
 
     @Column
-    String creation_time;   //yes, DBFlow accept Date format, but...
+    String creation_time;
 
-    /** version 2 */
-    @Column
-    String lastMessage;
-
-    public DialogItem() {
+    public MessageItem() {
     }
 
-    public DialogItem(String title, String desc) {
-        this.title = title;
-        this.desc = desc;
+    public MessageItem(String text, long id_author) {
+        this.text = text;
+        this.id_author = id_author;
 
         DateFormat df = new SimpleDateFormat("yyyy.MM.dd | HH:mm:ss", Locale.getDefault());
         this.creation_time = df.format(Calendar.getInstance().getTime());
     }
 
-    public DialogItem(String title, String desc, String creation_time) {
-        this.title = title;
-        this.desc = desc;
+    public MessageItem(String text, long id_author, String creation_time) {
+        this.text = text;
+        this.id_author = id_author;
         this.creation_time = creation_time;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDesc() {
-        return desc;
     }
 
     public long getId() {
         return id;
     }
 
-    public String getCreation_time() {
-        return creation_time;
+    public String getText() {
+        return text;
     }
 
-    public String getLastMessage() {
-        return lastMessage;
-        //return "";    //testing v1 <-> v2 DB migration
+    public long getId_author() {
+        return id_author;
+    }
+
+    public String getCreation_time() {
+        return creation_time;
     }
 
     public void setId(long id) {
         this.id = id;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setId_author(long id_author) {
+        this.id_author = id_author;
     }
 
     public void setCreation_time(String creation_time) {
         this.creation_time = creation_time;
-    }
-
-    public void setLastMessage(String lastMessage) {
-        this.lastMessage = lastMessage;
     }
 }

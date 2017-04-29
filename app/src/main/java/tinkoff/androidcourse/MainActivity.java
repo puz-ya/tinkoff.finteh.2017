@@ -6,24 +6,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
-
-import com.raizlabs.android.dbflow.config.FlowManager;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import tinkoff.androidcourse.model.db.DialogItem;
-import tinkoff.androidcourse.ui.activities.AnimationActivity;
 
 public class MainActivity extends AppCompatActivity {
 

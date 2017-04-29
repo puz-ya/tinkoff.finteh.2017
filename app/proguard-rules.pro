@@ -17,6 +17,7 @@
 #}
 
 -keep class tinkoff.androidcourse.Response { *; }
+-keep class * extends com.raizlabs.android.dbflow.config.DatabaseHolder { *; }
 
 # Rules from https://github.com/square/picasso
 -dontwarn com.squareup.okhttp.**
