@@ -23,6 +23,8 @@ import java.util.List;
 import tinkoff.androidcourse.model.db.DialogItem;
 
 import static android.app.Activity.RESULT_OK;
+import static tinkoff.androidcourse.App.ARG_MENU_ID;
+import static tinkoff.androidcourse.App.ARG_TITLE;
 
 /** Show list of chat groups */
 public class DialogFragment extends Fragment {
@@ -41,10 +43,11 @@ public class DialogFragment extends Fragment {
 
     }
 
-    public static DialogFragment newInstance(String title) {
+    public static DialogFragment newInstance(String title, int menu_id) {
         DialogFragment fragment = new DialogFragment();
         Bundle args = new Bundle();
-        //args.putString(ARG_TITLE, title);
+        args.putString(ARG_TITLE, title);
+        args.putInt(ARG_MENU_ID, menu_id);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,8 +55,6 @@ public class DialogFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //title = getArguments().getString(ARG_TITLE);
     }
 
     @Override

@@ -16,10 +16,12 @@ import tinkoff.androidcourse.ui.widgets.ProgressButton;
 
 public class LoginActivity extends AppCompatActivity implements LoginFragment.LoginListener {
 
+    // Service extras
     public static final String PENDING_INTENT = "pi";
     public static final String EXTRA_SUCCESS = "extra_success";
-    public static final String CREDENTIALS = "credentials";
-    public static final int LOGIN_REQUEST_CODE = 1;
+
+    // NavigationActivity extras
+    public static final String EXTRA_LOGIN = "extra_login_set";
 
     private EditText login;
     private EditText password;
@@ -28,45 +30,41 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
     private LoginFragment loginFragment;
 
     @Override
-    public void onResult(Boolean success) {
-        if (success) {
-            startNextScreen();
-        } else {
-            hideProgress();
-            new LoginActivity.MyDialogFragment().show(getSupportFragmentManager(), null);
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i("LoginActivity", "onCreate " + toString());
         setContentView(R.layout.activity_login);
 
-        login = (EditText) findViewById(R.id.edit_text_login);
-        password = (EditText) findViewById(R.id.edit_text_password);
+        //we skip Login check if we already logged
+        //needed more secure check
+        if(PrefManager.getInstance().loggedIn() && !PrefManager.getInstance().login().isEmpty()){
+            startNextScreen();
+        }else{
 
-        login.setText(PrefManager.getInstance().login());
-        if (savedInstanceState != null) {
+            login = (EditText) findViewById(R.id.edit_text_login);
+            password = (EditText) findViewById(R.id.edit_text_password);
+
+            login.setText(PrefManager.getInstance().login());
+
             FragmentManager supportFragmentManager = getSupportFragmentManager();
-            loginFragment = (LoginFragment) supportFragmentManager.findFragmentByTag(LoginFragment.TAG);
-            if (loginFragment != null) {
-
+            if (savedInstanceState != null) {
+                loginFragment = (LoginFragment) supportFragmentManager.findFragmentByTag(LoginFragment.TAG);
+                if (loginFragment == null) {
+                    createLoginFragment(supportFragmentManager);
+                }
             } else {
                 createLoginFragment(supportFragmentManager);
             }
-        } else {
-            createLoginFragment(getSupportFragmentManager());
-        }
 
-        button = (ProgressButton) findViewById(R.id.btn_enter);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showProgress();
-                new LoginTask(loginFragment).execute(new String[]{login.getText().toString()});
-            }
-        });
+            button = (ProgressButton) findViewById(R.id.btn_enter);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showProgress();
+                    new LoginTask(loginFragment).execute(new String[]{login.getText().toString(),password.getText().toString()});
+                }
+            });
+        }
     }
 
     public void showProgress() {
@@ -77,9 +75,20 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
         button.hideProgress();
     }
 
+    @Override
+    public void onResult(Boolean success) {
+        if (success) {
+            PrefManager.getInstance().saveLoggedIn(true);
+            startNextScreen();
+        } else {
+            hideProgress();
+            new LoginActivity.MyDialogFragment().show(getSupportFragmentManager(), null);
+        }
+    }
+
     void startNextScreen() {
         Intent intent = new Intent(this, NavigationActivity.class);
-        intent.putExtra("LOGIN", login.getText().toString());
+        intent.putExtra(EXTRA_LOGIN, PrefManager.getInstance().login());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
@@ -95,7 +104,7 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             Dialog dialog = super.onCreateDialog(savedInstanceState);
-            dialog.setTitle("У тебя проблемы");
+            dialog.setTitle(getString(R.string.login_problem));
             return dialog;
         }
     }

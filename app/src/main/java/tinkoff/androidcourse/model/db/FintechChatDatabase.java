@@ -40,8 +40,8 @@ public final class FintechChatDatabase {
 
         @Override
         public void onPreMigrate() {
-            super.onPreMigrate();
             set(DialogItem_Table.lastMessage.eq("New Name")).where(DialogItem_Table.id.greaterThan(0L));
+            super.onPreMigrate();
         }
     }
     //*/

@@ -17,8 +17,21 @@ class LoginTask extends AsyncTask<String[], Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(String[]... credentials) {
+        //emulating slow internet (rotate device NOW)
+        try {
+            Thread.sleep(5000);
+        }catch (InterruptedException ex){
+
+        }
+
+        //check if not empty
+        if(credentials[0][0].isEmpty() || credentials[0][1].isEmpty()){
+            return false;
+        }
+
         PrefManager.getInstance().saveLogin(credentials[0][0]);
-        //TODO: check login
+
+
         return true;
     }
 

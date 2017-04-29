@@ -23,13 +23,24 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import tinkoff.androidcourse.model.PrefManager;
+
+import static tinkoff.androidcourse.App.ARG_MENU_ID;
+import static tinkoff.androidcourse.App.ARG_TITLE;
+
 public class NavigationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
                 DialogFragment.OnLoadChat {
 
     private final static int MENU_DIALOGS = 0;
+    private final static int MENU_SETTINGS = 1;
+    private final static int MENU_ABOUT = 2;
+
     private ActionBarDrawerToggle toggle;
+    NavigationView navigationView;
     private Toolbar mToolbar;
+    private Fragment previousFragment;
+    private Fragment prevFragment2;
 
     @Override
     public void onBackPressed() {
@@ -38,25 +49,45 @@ public class NavigationActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
             return;
         }
-        
-        super.onBackPressed();
+
+        int count = getSupportFragmentManager().getBackStackEntryCount();
+        if (count == 0) {
+            super.onBackPressed();
+        } else {
+            getSupportFragmentManager().popBackStack();
+            previousFragment = getPreviousFragment();
+            if (previousFragment != null) {
+                String title = previousFragment.getArguments().getString(ARG_TITLE, null);
+                int menu_id = previousFragment.getArguments().getInt(ARG_MENU_ID, -1);
+                mToolbar.setTitle(title);
+                switch(menu_id){
+                    case MENU_DIALOGS: navigationView.getMenu().getItem(MENU_DIALOGS).setChecked(true); break;
+                    case MENU_SETTINGS: navigationView.getMenu().getItem(MENU_SETTINGS).setChecked(true); break;
+                    case MENU_ABOUT: navigationView.getMenu().getItem(MENU_ABOUT).setChecked(true); break;
+                    default: navigationView.getMenu().getItem(MENU_DIALOGS).setChecked(true); break;
+                }
+            }else{
+                mToolbar.setTitle(getString(R.string.menu_dialogs));
+                navigationView.getMenu().getItem(MENU_DIALOGS).setChecked(true);
+            }
+        }
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        String fragment_title;
         switch (item.getItemId()) {
             case R.id.nav_dialogs:
-                mToolbar.setTitle(getString(R.string.menu_dialogs));
-                addFragment(DialogFragment.newInstance(""));
+                fragment_title = getString(R.string.menu_dialogs);
+                addFragment(DialogFragment.newInstance(fragment_title,MENU_DIALOGS));
                 break;
             case R.id.nav_settings:
-                //StubFragment settingsFragment = StubFragment.newInstance("Настройки");
-                mToolbar.setTitle(getString(R.string.menu_settings));
-                addFragment(new SettingsFragment());
+                fragment_title = getString(R.string.menu_settings);
+                addFragment(SettingsFragment.newInstance(fragment_title,MENU_SETTINGS));
                 break;
             case R.id.nav_about:
-                mToolbar.setTitle(getString(R.string.menu_about));
-                addFragment(AboutFragment.newInstance(""));
+                fragment_title = getString(R.string.menu_about);
+                addFragment(AboutFragment.newInstance(fragment_title, MENU_ABOUT));
                 break;
             case R.id.nav_logout:
                 logOut();
@@ -86,38 +117,34 @@ public class NavigationActivity extends AppCompatActivity
         toggle = new ActionBarDrawerToggle(this, drawer, mToolbar, 0, 0);
         drawer.addDrawerListener(toggle);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
             navigationView.getMenu().getItem(MENU_DIALOGS).setChecked(true);
             //otherwise it will show empty screen after BACK button press
             //onNavigationItemSelected(navigationView.getMenu().getItem(MENU_DIALOGS));
+            previousFragment = DialogFragment.newInstance(getString(R.string.menu_dialogs),MENU_DIALOGS);
+
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.setCustomAnimations(R.anim.enter_left, R.anim.exit_right);
-            fragmentTransaction = fragmentTransaction.replace(R.id.content_navigation, DialogFragment.newInstance(""), "navigationFragmentTag");
+            fragmentTransaction = fragmentTransaction.replace(
+                    R.id.content_navigation, previousFragment, Integer.toString(getFragmentCount()));
             fragmentTransaction.commit();
         }
 
-        /*
-        mSharedPreferences = getApplicationContext()
-                .getSharedPreferences(LoginActivity.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
-
         //get EXTRA from LoginActivity
         String sLogin = "Login: ";
-
         Intent intent = getIntent();
 
-        //we can get login from Intent or SharedPreferences
-        if(intent.getStringExtra(LoginActivity.EXTRA_LOGIN) != null){
+        //we will get login from Intent
+        if(intent.hasExtra(LoginActivity.EXTRA_LOGIN) && intent.getStringExtra(LoginActivity.EXTRA_LOGIN) != null){
             sLogin += intent.getStringExtra(LoginActivity.EXTRA_LOGIN);
-        }else{
-            sLogin += mSharedPreferences.getString(LoginActivity.EXTRA_LOGIN, "NaN");
         }
+
         View header = navigationView.getHeaderView(0);
         TextView text = (TextView) header.findViewById(R.id.textView);
         text.setText(sLogin);
-        */
     }
 
     @Override
@@ -130,23 +157,22 @@ public class NavigationActivity extends AppCompatActivity
 
     /** fragment replacement with animation */
     private void addFragment(Fragment fragment) {
+        previousFragment = getSupportFragmentManager().findFragmentByTag("navigationFragmentTag");
+
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.setCustomAnimations(R.anim.enter_left, R.anim.exit_right, R.anim.enter_right, R.anim.exit_left);
-        fragmentTransaction = fragmentTransaction.replace(R.id.content_navigation, fragment, "navigationFragmentTag");
-        fragmentTransaction.addToBackStack("navigationFragmentTag");
+        fragmentTransaction = fragmentTransaction.replace(R.id.content_navigation, fragment, Integer.toString(getFragmentCount()));
+        fragmentTransaction.addToBackStack(Integer.toString(getFragmentCount()));
         fragmentTransaction.commit();
+
+        //currentFragment = fragment;
+        mToolbar.setTitle(fragment.getArguments().getString(ARG_TITLE));
     }
 
-    /** erase previous login values */
+    /** erase previous logged bool value (we need login value for re-enter) */
     private void logOut(){
 
-        /*
-        mSharedPreferences
-                .edit()
-                .putString(LoginActivity.EXTRA_LOGIN, "")
-                .putString(LoginActivity.EXTRA_PASSW, "")
-                .apply();
-                */
+        PrefManager.getInstance().saveLoggedIn(false);
 
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
@@ -174,5 +200,19 @@ public class NavigationActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /** black Stack Overflow magic */
+    protected int getFragmentCount() {
+        return getSupportFragmentManager().getBackStackEntryCount();
+    }
+    private Fragment getFragmentAt(int index) {
+        return getFragmentCount() > 0 ? getSupportFragmentManager().findFragmentByTag(Integer.toString(index)) : null;
+    }
+    protected Fragment getCurrentFragment() {
+        return getFragmentAt(getFragmentCount() - 1);
+    }
+    protected Fragment getPreviousFragment() {
+        return getFragmentAt(getFragmentCount() - 2);
     }
 }

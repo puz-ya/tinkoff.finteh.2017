@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import static tinkoff.androidcourse.App.ARG_MENU_ID;
+import static tinkoff.androidcourse.App.ARG_TITLE;
+
 public class AboutFragment extends Fragment {
 
     TextView tv_about;
@@ -22,10 +25,11 @@ public class AboutFragment extends Fragment {
 
     }
 
-    public static AboutFragment newInstance(String title) {
+    public static AboutFragment newInstance(String title, int menu_id) {
         AboutFragment fragment = new AboutFragment();
         Bundle args = new Bundle();
-        //args.putString(ARG_TITLE, title);
+        args.putString(ARG_TITLE, title);
+        args.putInt(ARG_MENU_ID, menu_id);
         fragment.setArguments(args);
         return fragment;
     }
@@ -33,8 +37,6 @@ public class AboutFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //title = getArguments().getString(ARG_TITLE);
     }
 
     @Override

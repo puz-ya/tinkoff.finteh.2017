@@ -30,7 +30,7 @@ public class ChatFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            //title = getArguments().getString(ARG_TITLE);
+            //
         }
     }
 
