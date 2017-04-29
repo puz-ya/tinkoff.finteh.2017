@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditText
+        android:id="@+id/dialog_add_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minWidth="100dp"
+        android:layout_gravity="start"
+        android:gravity="center"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:inputType="textPersonName"
+        android:maxLines="1"
+        android:hint="@string/dialog_add_title_hint"
+        />
+
+    <EditText
+        android:id="@+id/dialog_add_descr"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:minWidth="100dp"
+        android:layout_gravity="center"
+        android:gravity="start"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:inputType="textMultiLine"
+        android:maxLength="1000"
+        android:maxLines="5"
+        android:hint="@string/dialog_add_descr_hint"
+        android:layout_weight="1"
+        />
+
+    <Button
+        android:id="@+id/dialog_add_button"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:text="@string/dialog_add_button"
+
+        />
+</merge>

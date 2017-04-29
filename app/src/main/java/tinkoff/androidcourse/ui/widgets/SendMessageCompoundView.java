@@ -17,22 +17,22 @@ import tinkoff.androidcourse.R;
  * @author Puzino Yury
  */
 
-public class SendMessageView extends LinearLayout {
+public class SendMessageCompoundView extends LinearLayout {
 
     private EditText editText;
     private Button button;
 
-    public SendMessageView(Context context) {
+    public SendMessageCompoundView(Context context) {
         super(context);
         init(context);
     }
 
-    public SendMessageView(Context context, AttributeSet attrs) {
+    public SendMessageCompoundView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public SendMessageView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SendMessageCompoundView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
@@ -61,6 +61,10 @@ public class SendMessageView extends LinearLayout {
                 }
             }
         });
+    }
+
+    public Button getButton(){
+        return button;
     }
 
 }

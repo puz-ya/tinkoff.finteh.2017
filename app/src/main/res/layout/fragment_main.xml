@@ -7,33 +7,20 @@
     android:layout_height="match_parent"
     tools:context="tinkoff.androidcourse.DialogFragment">
 
-    <!--
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-    </android.support.design.widget.AppBarLayout>
-    -->
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_dialogs"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        android:layout_marginBottom="40dp"
+        />
 
     <Button
         android:id="@+id/add_dialog"
         android:layout_alignParentBottom="true"
-        android:text="Добавить"
+        android:text="@string/dialogs_list_add"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="40dp"
+        />
 
 </RelativeLayout>

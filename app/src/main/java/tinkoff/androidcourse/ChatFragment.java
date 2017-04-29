@@ -12,7 +12,7 @@ import android.widget.Button;
 import java.util.ArrayList;
 import java.util.List;
 
-import tinkoff.androidcourse.ui.widgets.SendMessageView;
+import tinkoff.androidcourse.ui.widgets.SendMessageCompoundView;
 
 /** Show list of messages in selected chat group */
 public class ChatFragment extends Fragment {
@@ -53,10 +53,13 @@ public class ChatFragment extends Fragment {
     }
 
     private void initSendMessageView(View view) {
-        SendMessageView sView = (SendMessageView) view.findViewById(R.id.send_message_view);
-        Button button = (Button) view.findViewById(R.id.chat_button_send);
-
-        //set click listener
+        SendMessageCompoundView sView = (SendMessageCompoundView) view.findViewById(R.id.send_message_view);
+        sView.getButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //set click action
+            }
+        });
     }
 
     private void initRecyclerChatView(View view) {

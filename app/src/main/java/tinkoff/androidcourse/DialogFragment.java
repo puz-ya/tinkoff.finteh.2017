@@ -33,7 +33,8 @@ public class DialogFragment extends Fragment {
 
     OnLoadChat mCallback;
 
-    private static final String EXTRA_ID = "CHAT_ID";
+    public static final String EXTRA_DIALOG_TITLE = "DIALOG_TITLE";
+    public static final String EXTRA_DIALOG_DESCR = "DIALOG_DESCR";
     private static final int REQUEST_CODE_ADD_DIALOG = 55;
 
     public DialogFragment(){
@@ -107,18 +108,15 @@ public class DialogFragment extends Fragment {
         if (requestCode == REQUEST_CODE_ADD_DIALOG) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                List<String> strings = new ArrayList<>();
-                if(data.hasExtra("DIALOG_TITLE") && data.hasExtra("DIALOG_DESCRIPT")) {
-                    strings.add(data.getStringExtra("DIALOG_TITLE"));
-                    strings.add(data.getStringExtra("DIALOG_DESCRIPT"));
-                }else{
-                    strings.add("NONE");
-                    strings.add("NONE");
-                }
+                // Check extra
+                if(data.hasExtra(EXTRA_DIALOG_TITLE) && data.hasExtra(EXTRA_DIALOG_DESCR)) {
 
-                DialogItem dialogItem = new DialogItem("Title is " + strings.get(0), "Description is " + strings.get(1));
-                FlowManager.getModelAdapter(DialogItem.class).save(dialogItem);
-                adapter.addDialog(dialogItem);
+                    DialogItem dialogItem = new DialogItem(
+                            "Title is " + data.getStringExtra(EXTRA_DIALOG_TITLE),
+                            "Description is " + data.getStringExtra(EXTRA_DIALOG_DESCR));
+                    FlowManager.getModelAdapter(DialogItem.class).save(dialogItem);
+                    adapter.addDialog(dialogItem);
+                }
             }
         }
     }

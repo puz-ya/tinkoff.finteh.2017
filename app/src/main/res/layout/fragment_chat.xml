@@ -31,7 +31,7 @@
         android:layout_marginBottom="60dp"
         />
 
-    <tinkoff.androidcourse.ui.widgets.SendMessageView
+    <tinkoff.androidcourse.ui.widgets.SendMessageCompoundView
         android:id="@+id/send_message_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
 
         login = (EditText) findViewById(R.id.edit_text_login);
         password = (EditText) findViewById(R.id.edit_text_password);
-        button = (ProgressButton) findViewById(R.id.btn_enter);
+
         login.setText(PrefManager.getInstance().login());
         if (savedInstanceState != null) {
             FragmentManager supportFragmentManager = getSupportFragmentManager();
@@ -59,6 +59,7 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
             createLoginFragment(getSupportFragmentManager());
         }
 
+        button = (ProgressButton) findViewById(R.id.btn_enter);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
