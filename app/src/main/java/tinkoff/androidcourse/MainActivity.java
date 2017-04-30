@@ -12,7 +12,7 @@ import android.widget.ImageView;
 public class MainActivity extends AppCompatActivity {
 
     /** Waiting... **/
-    private final int SPLASH_DISPLAY_LENGTH = 1000;
+    private final static int SPLASH_DISPLAY_LENGTH = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

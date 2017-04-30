@@ -28,7 +28,7 @@
             android:layout_height="100dp"
             android:layout_below="@id/tv_about"
             android:contentDescription="@string/about_logo_descr"
-            app:srcCompat="@drawable/yp"
+            app:srcCompat="@drawable/ic_cross_red"
             />
     </RelativeLayout>
 

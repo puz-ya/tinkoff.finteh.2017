@@ -6,7 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+
+import tinkoff.androidcourse.model.db.DialogItem;
+import tinkoff.androidcourse.model.db.MessageItem;
 
 /**
  * Created on 23.03.2017
@@ -35,11 +40,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewChatHolder
         inflater = LayoutInflater.from(parent.getContext());
 
         //set layout depends on TYPE
-        if (viewType == USER_MESSAGE) {
-            view = inflater.inflate(R.layout.item_chat_messages_right, parent, false);
-        }
-        else if (viewType == OTHERS_MESSAGE) {
-            view = inflater.inflate(R.layout.item_chat_messages_left, parent, false);
+        switch(viewType){
+            case USER_MESSAGE:
+                view = inflater.inflate(R.layout.item_chat_messages_right, parent, false);
+                break;
+            case OTHERS_MESSAGE:
+                view = inflater.inflate(R.layout.item_chat_messages_left, parent, false);
+                break;
+            default:
+                view = inflater.inflate(R.layout.item_chat_messages_left, parent, false);
+                break;
         }
 
         return new ChatAdapter.ViewChatHolder(view, clickListener);
@@ -48,13 +58,24 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewChatHolder
     @Override
     public void onBindViewHolder(ChatAdapter.ViewChatHolder holder, int position) {
         holder.text.setText(dataset.get(position).getText());
-        holder.time.setText(dataset.get(position).getDate());
-        holder.username.setText(dataset.get(position).getUsername());
+        holder.time.setText(dataset.get(position).getCreation_time());
+        holder.userId.setText(String.format(Locale.getDefault(),"%d", dataset.get(position).getId_author()) );
     }
 
     @Override
     public int getItemCount() {
         return dataset.size();
+    }
+
+    public void setItems(List<MessageItem> messageItems) {
+        dataset = messageItems;
+        notifyDataSetChanged();
+    }
+
+    public void addMessage(MessageItem messageItem) {
+        //Collections.reverse(dataset);
+        dataset.add(0, messageItem);
+        notifyItemInserted(0);
     }
 
     /* get correct type based on User */
@@ -64,7 +85,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewChatHolder
         MessageItem messageItem = dataset.get(position);
 
         if (messageItem != null){
-            if(messageItem.getUsername().equals("user1")){
+            if(messageItem.getId_author() == 1){
                 return USER_MESSAGE;
             }
             return OTHERS_MESSAGE;
@@ -73,18 +94,23 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewChatHolder
         return super.getItemViewType(position);
     }
 
+    @Override
+    public long getItemId(int position) {
+        return dataset.get(position).getId();
+    }
+
     public static class ViewChatHolder extends RecyclerView.ViewHolder {
 
         public TextView text;
         public TextView time;
-        public TextView username;
+        public TextView userId;
 
         public ViewChatHolder(View view, OnItemClickListener listener) {
             super(view);
 
             text = (TextView) view.findViewById(R.id.tv_message_text);
             time = (TextView) view.findViewById(R.id.tv_message_time);
-            username = (TextView) view.findViewById(R.id.tv_message_username);
+            userId = (TextView) view.findViewById(R.id.tv_message_username);
             setListener(listener);
         }
 

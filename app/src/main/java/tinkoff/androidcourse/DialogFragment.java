@@ -30,7 +30,7 @@ import static tinkoff.androidcourse.App.ARG_TITLE;
 public class DialogFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private DialogsAdapter adapter;
+    private DialogAdapter adapter;
     private Button addDialog;
 
     OnLoadChat mCallback;
@@ -82,11 +82,12 @@ public class DialogFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new DialogsAdapter(new ArrayList<DialogItem>(), new OnItemClickListener() {
+        adapter = new DialogAdapter(new ArrayList<DialogItem>(), new OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Toast.makeText(getActivity(), "position = " + position, Toast.LENGTH_SHORT).show();
-                mCallback.startChatScreen(adapter.getItemId(position));
+                Toast.makeText(getActivity(), "Dialog id (DB) = " + adapter.getItemId(position), Toast.LENGTH_SHORT).show();
+                long chatId = adapter.getItemId(position);
+                mCallback.startChatScreen(chatId);
             }
         });
         recyclerView.setAdapter(adapter);
@@ -122,9 +123,25 @@ public class DialogFragment extends Fragment {
         }
     }
 
+    List<DialogItem> itemList;
     @NonNull
     private List<DialogItem> getPreviousDialogItems() {
         List<DialogItem> itemList = SQLite.select().from(DialogItem.class).queryList();
+
+        /*
+        DatabaseDefinition database = FlowManager.getDatabase(FintechChatDatabase.class);
+        Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+            @Override
+            public void execute(DatabaseWrapper databaseWrapper) {
+                //called.set(true);
+                itemList = SQLite.select().from(DialogItem.class).queryList();
+            }
+        }).build();
+        transaction.execute(); // execute
+
+        transaction.cancel();
+        */
+
         return itemList;
     }
 

@@ -18,7 +18,6 @@ import static tinkoff.androidcourse.App.ARG_TITLE;
 public class AboutFragment extends Fragment {
 
     TextView tv_about;
-    View secondView;
     Boolean aBoolean;
 
     public AboutFragment(){

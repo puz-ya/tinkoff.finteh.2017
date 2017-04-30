@@ -26,6 +26,9 @@ public class MessageItem {
     long id_author;
 
     @Column
+    long id_dialog;
+
+    @Column
     String creation_time;
 
     public MessageItem() {
@@ -34,15 +37,19 @@ public class MessageItem {
     public MessageItem(String text, long id_author) {
         this.text = text;
         this.id_author = id_author;
+        this.id_dialog = 1; //common dialog for all "strange" messages
 
         DateFormat df = new SimpleDateFormat("yyyy.MM.dd | HH:mm:ss", Locale.getDefault());
         this.creation_time = df.format(Calendar.getInstance().getTime());
     }
 
-    public MessageItem(String text, long id_author, String creation_time) {
+    public MessageItem(String text, long id_author, long id_dialog) {
         this.text = text;
         this.id_author = id_author;
-        this.creation_time = creation_time;
+        this.id_dialog = id_dialog;
+
+        DateFormat df = new SimpleDateFormat("yyyy.MM.dd | HH:mm:ss", Locale.getDefault());
+        this.creation_time = df.format(Calendar.getInstance().getTime());
     }
 
     public long getId() {
@@ -75,5 +82,13 @@ public class MessageItem {
 
     public void setCreation_time(String creation_time) {
         this.creation_time = creation_time;
+    }
+
+    public long getId_dialog() {
+        return id_dialog;
+    }
+
+    public void setId_dialog(long id_dialog) {
+        this.id_dialog = id_dialog;
     }
 }

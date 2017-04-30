@@ -6,23 +6,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import tinkoff.androidcourse.model.db.DialogItem;
 
-public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHolder> {
+public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.ViewHolder> {
 
     private List<DialogItem> dataset;
     private OnItemClickListener clickListener;
 
-    public DialogsAdapter(List<DialogItem> dataset, OnItemClickListener clickListener) {
+    public DialogAdapter(List<DialogItem> dataset, OnItemClickListener clickListener) {
         this.dataset = dataset;
         this.clickListener = clickListener;
     }
 
     @Override
-    public DialogsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DialogAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_dialog, parent, false);
         return new ViewHolder(view, clickListener);
     }
@@ -47,6 +46,11 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
     public void setItems(List<DialogItem> dialogItems) {
         dataset = dialogItems;
         notifyDataSetChanged();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return dataset.get(position).getId();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

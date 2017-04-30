@@ -183,7 +183,7 @@ public class NavigationActivity extends AppCompatActivity
     public void startChatScreen(long pos){
 
         Bundle bundle = new Bundle();
-        bundle.putLong(ChatFragment.ARG_POSITION, pos);
+        bundle.putLong(ChatFragment.ARG_DIALOG_ID, pos);
 
         ChatFragment chatFragment = new ChatFragment();
         chatFragment.setArguments(bundle);
@@ -202,10 +202,11 @@ public class NavigationActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    /** black Stack Overflow magic */
+    /** count fragments for updating correct Title */
     protected int getFragmentCount() {
         return getSupportFragmentManager().getBackStackEntryCount();
     }
+    @Nullable
     private Fragment getFragmentAt(int index) {
         return getFragmentCount() > 0 ? getSupportFragmentManager().findFragmentByTag(Integer.toString(index)) : null;
     }

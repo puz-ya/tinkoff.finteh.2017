@@ -67,4 +67,15 @@ public class SendMessageCompoundView extends LinearLayout {
         return button;
     }
 
+    public String getMessage(){
+        return editText.getText().toString();
+    }
+
+    /** return to initial state - clear text & inactive button
+     * */
+    public void setSendState(){
+        editText.setText("");   //clear previous text
+        editText.clearFocus();
+    }
+
 }
