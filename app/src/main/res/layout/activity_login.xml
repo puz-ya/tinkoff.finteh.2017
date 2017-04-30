@@ -10,29 +10,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="tinkoff.androidcourse.LoginActivity">
 
-    <EditText
-        android:id="@+id/edit_text_login"
+    <FrameLayout
+        android:id="@+id/content_login"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/edit_login_hint"
-        android:maxLines="1"
-        android:inputType="textPersonName"
-        />
+        android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/edit_text_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/edit_pass_hint"
-        android:imeActionId="@+id/login"
-        android:imeOptions="actionUnspecified"
-        android:inputType="textPassword"
-        android:maxLines="1"
-        />
+    </FrameLayout>
 
-    <tinkoff.androidcourse.ui.widgets.ProgressButton
-        android:id="@+id/btn_enter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp" />
 </LinearLayout>

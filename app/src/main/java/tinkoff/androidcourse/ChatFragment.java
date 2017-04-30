@@ -1,37 +1,45 @@
 package tinkoff.androidcourse;
 
+import android.app.ProgressDialog;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-import tinkoff.androidcourse.model.db.DialogItem;
 import tinkoff.androidcourse.model.db.MessageItem;
 import tinkoff.androidcourse.model.db.MessageItem_Table;
 import tinkoff.androidcourse.ui.widgets.SendMessageCompoundView;
 
 /** Show list of messages in selected chat group */
-public class ChatFragment extends Fragment {
+public class ChatFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<List<MessageItem>>{
 
     private RecyclerView recyclerView;
     private ChatAdapter adapter;
+
     private SendMessageCompoundView sView;
-    //private
+    ProgressDialog progress;
+    private View mView;
 
     public final static String ARG_DIALOG_ID = "DialogID";
     private long chatId = -1L;
+    private static final int DELAY_INSERT_UPDATE = 2000;
+    private static final int DELAY_GET_FROM_SOURCE = 7000;
 
     public ChatFragment(){}
 
@@ -56,16 +64,25 @@ public class ChatFragment extends Fragment {
             chatId = getArguments().getLong(ARG_DIALOG_ID);
         }
 
-        initRecyclerChatView(view);
-        List<MessageItem> messageItems = getDialogMessageItems();
-        adapter.setItems(messageItems);
-
         initSendMessageView(view);
+        this.mView = view;
 
         return view;
     }
 
-    private void initSendMessageView(View view) {
+    @Override public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (getActivity().findViewById(R.id.toolbar) != null){
+            Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+            toolbar.setTitle(getString(R.string.chat_fragment_set_title) + String.format(Locale.getDefault(), "%d", chatId));
+        }
+
+        showProgressLoader();
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+        private void initSendMessageView(View view) {
         sView = (SendMessageCompoundView) view.findViewById(R.id.send_message_view);
         sView.getButton().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,30 +95,31 @@ public class ChatFragment extends Fragment {
         });
     }
 
-    /** //TODO: we didn't implement user_id feature (no DB_table, only loginName...) -> set default
+    /** //TODO: we didn't implement user_id feature (no DB_table, only loginName...) -> set default 1
      * */
     private void addMessageItemToChat(String message){
         MessageItem messageItem = new MessageItem(
                 message,
                 1,
                 chatId);
-        FlowManager.getModelAdapter(MessageItem.class).save(messageItem);
-        adapter.addMessage(messageItem);
-        recyclerView.smoothScrollToPosition(0);
+
+        updateMessages(messageItem);
     }
 
-    private void initRecyclerChatView(View view) {
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_chat);
+    private void initRecyclerChatView(List<MessageItem> dataSet) {
+        recyclerView = (RecyclerView) mView.findViewById(R.id.recycler_view_chat);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         //setting chat from bottom
         layoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new ChatAdapter(new ArrayList<MessageItem>(), new OnItemClickListener() {
+        adapter = new ChatAdapter(dataSet, new OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Toast.makeText(getActivity(), "Message id (from DB) = " + adapter.getItemId(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),
+                        getString(R.string.chat_toast_id) + adapter.getItemId(position),
+                        Toast.LENGTH_SHORT).show();
             }
         });
         recyclerView.setAdapter(adapter);
@@ -118,15 +136,71 @@ public class ChatFragment extends Fragment {
         return itemList;
     }
 
-    /*
-    private List<MessageItem> createDataset() {
-        List<MessageItem> list = new ArrayList<>();
-        list.add(new MessageItem("Text1", "2017-03-20", "user1"));
-        list.add(new MessageItem("Text2", "2017-03-21", "user2"));
-        list.add(new MessageItem("Text3", "2017-03-22", "user3"));
-        list.add(new MessageItem("Text4", "2017-03-23", "user4"));
-        list.add(new MessageItem("Text5", "2017-03-24", "user5"));
-        return list;
+    private void updateMessages(final MessageItem message){
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable(){
+            @Override
+            public void run(){
+                FlowManager.getModelAdapter(MessageItem.class).save(message);
+                adapter.addMessage(message);
+                recyclerView.smoothScrollToPosition(0);
+                adapter.notifyDataSetChanged();
+            }
+        }, DELAY_INSERT_UPDATE);
     }
-    //*/
+
+    @Override
+    public Loader<List<MessageItem>> onCreateLoader(int id, Bundle args) {
+
+        Loader<List<MessageItem>> mLoader = new Loader<List<MessageItem>>(getActivity()){
+            @Override
+            protected void onStartLoading() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(DELAY_GET_FROM_SOURCE);
+                        }catch (InterruptedException ex){
+                            ex.printStackTrace();
+                        }
+                        deliverResult(getDialogMessageItems());
+                    }
+                }).start();
+            }
+
+            @Override
+            protected void onStopLoading() {}
+        };
+
+        return mLoader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<MessageItem>> loader, final List<MessageItem> data) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                initRecyclerChatView(data);
+                hideProgressLoader();
+            }
+        });
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<MessageItem>> loader) {}
+
+    /** ProgressDialog - show & hide */
+    public void showProgressLoader(){
+        progress = new ProgressDialog(getActivity());
+        progress.setTitle(getString(R.string.chat_progress_title));
+        progress.setMessage(getString(R.string.chat_progress_message));
+        progress.setCancelable(false);
+        progress.show();
+    }
+
+    public void hideProgressLoader(){
+        progress.dismiss();
+    }
+
 }

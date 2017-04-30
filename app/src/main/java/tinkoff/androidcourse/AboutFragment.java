@@ -1,9 +1,7 @@
 package tinkoff.androidcourse;
 
-import android.support.transition.Scene;
 import android.support.transition.TransitionManager;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
@@ -54,6 +52,7 @@ public class AboutFragment extends Fragment {
         final ViewGroup sceneRoot = (ViewGroup) view.findViewById(R.id.about_scene);
         final View image = view.findViewById(R.id.about_logo);
 
+        //set LayoutTransition, here <-> there :D
         Button goButton = (Button)view.findViewById(R.id.goButton);
         goButton.setOnClickListener(new View.OnClickListener() {
             @Override

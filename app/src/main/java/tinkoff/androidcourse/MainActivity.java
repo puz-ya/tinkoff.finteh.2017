@@ -9,10 +9,17 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
+/**
+ * Created on 04.2017
+ * @author Puzino Yury
+ *
+ * Simple splash activity with Animated Vector Drawable ("YP" letters rotation)
+ */
+
 public class MainActivity extends AppCompatActivity {
 
     /** Waiting... **/
-    private final static int SPLASH_DISPLAY_LENGTH = 1000;
+    private final static int SPLASH_DISPLAY_LENGTH = 2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             ((Animatable) drawable).start();
         } //else just static image
 
-        /* Handler for delay.*/
+        /* Handler for delay */
         new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {

@@ -1,6 +1,7 @@
 package tinkoff.androidcourse;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import tinkoff.androidcourse.model.PrefManager;
 
@@ -10,6 +11,7 @@ import tinkoff.androidcourse.model.PrefManager;
 class LoginTask extends AsyncTask<String[], Void, Boolean> {
 
     private LoginFragment loginFragment;
+    private static final int DELAY = 10000;
 
     public LoginTask(LoginFragment loginFragment) {
         this.loginFragment = loginFragment;
@@ -19,18 +21,17 @@ class LoginTask extends AsyncTask<String[], Void, Boolean> {
     protected Boolean doInBackground(String[]... credentials) {
         //emulating slow internet (rotate device NOW)
         try {
-            Thread.sleep(5000);
+            Thread.sleep(DELAY);
         }catch (InterruptedException ex){
-
+            ex.printStackTrace();
         }
 
-        //check if not empty
+        //check if Login & Password not empty
         if(credentials[0][0].isEmpty() || credentials[0][1].isEmpty()){
             return false;
         }
 
         PrefManager.getInstance().saveLogin(credentials[0][0]);
-
 
         return true;
     }

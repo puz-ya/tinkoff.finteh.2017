@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 /**
  * @author Sergey Boishtyan
+ * @author Puzino Yury - some modifications
  */
 public final class PrefManager {
 

@@ -44,6 +44,7 @@ public class SendMessageCompoundView extends LinearLayout {
         button = (Button) this.findViewById(R.id.chat_button_send);
         button.setEnabled(false);
 
+        //create listener to check for non-empty EditText
         editText.addTextChangedListener(new TextWatcher() {
 
             @Override

@@ -66,61 +66,16 @@ public final class FintechChatDatabase {
             }
             cursor_messages.close();
 
-            //Cursor cursor_messages = database.rawQuery("SELECT `id`,`text`,`id_dialog`,`creation_time` FROM MessageItem WHERE `creation_time` GROUP By `id_dialog`", null);
+            //bad practice, but nothing better :(
             for(int i=0; i < lastMess.size(); i++){
-                /*
-                SQLite.update(DialogItem_Table.class)
-                        .set(DialogItem_Table.lastMessage.eq(lastMess.get(i)))
-                        .where(DialogItem_Table.id.is(lastIdDialog.get(i)));
-                       */
-                /*
-                Cursor cursor_update = database.rawQuery(
-                        "UPDATE DialogItem SET lastMessage = ? " +
-                                "WHERE id = ?",
-                        new String[]{lastMess.get(i),String.format(Locale.getDefault(), "%d", lastIdDialog.get(i))});
-                cursor_update.close();
-                //*/
-
-                /*
-                ContentValues cv = new ContentValues();
-                cv.put("lastMessage", lastMess.get(i));
-
-                String condition = String.format(Locale.getDefault(), "%d", lastIdDialog.get(i));
-                String where = "id = " + condition;
-
-                database.updateWithOnConflict("DialogItem", cv,
-                        where, null, 0);
-                //*/
-
-                /*
-                String condition = String.format(Locale.getDefault(), "%d", lastIdDialog.get(i));
-                String s = "UPDATE DialogItem SET `lastMessage` = " + lastMess.get(i) + " WHERE `id`=" + condition;
-                database.execSQL(s);
-                */
 
                 SQLite.update(DialogItem.class)
                         .set(DialogItem_Table.lastMessage.eq(lastMess.get(i)))
                         .where(DialogItem_Table.id.eq(lastIdDialog.get(i)))
                         .execute(database); // required inside a migration to pass the wrapper
-                /*
-                Cursor cursor_up = database.rawQuery(s, null);
-                if (cursor_up.moveToFirst()) {
-                    Integer w = 0;
-                    w++;
-                }
-                cursor_up.close();
-                */
+
             }
 
-            //SQLite.update(DialogItem_Table.class)
-            //        .set(DialogItem_Table.lastMessage.eq("New Name")).where(DialogItem_Table.id.greaterThan(0L));
-
-            /*
-            SQLite.update(DialogItem_Table.class)
-                    .set(Employee_Table.status.eq("Invalid"))
-                    .where(Employee_Table.job.eq("Laid Off"))
-                    .execute(database); // required inside a migration to pass the wrapper
-                    */
         }
     }
 }

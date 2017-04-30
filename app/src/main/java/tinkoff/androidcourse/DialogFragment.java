@@ -1,10 +1,14 @@
 package tinkoff.androidcourse;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +21,6 @@ import android.widget.Toast;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import tinkoff.androidcourse.model.db.DialogItem;
@@ -27,7 +30,8 @@ import static tinkoff.androidcourse.App.ARG_MENU_ID;
 import static tinkoff.androidcourse.App.ARG_TITLE;
 
 /** Show list of chat groups */
-public class DialogFragment extends Fragment {
+public class DialogFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<List<DialogItem>>{
 
     private RecyclerView recyclerView;
     private DialogAdapter adapter;
@@ -35,13 +39,17 @@ public class DialogFragment extends Fragment {
 
     OnLoadChat mCallback;
 
+    View mView;
+    ProgressDialog progress4Dialogs;
+
     public static final String EXTRA_DIALOG_TITLE = "DIALOG_TITLE";
     public static final String EXTRA_DIALOG_DESCR = "DIALOG_DESCR";
     private static final int REQUEST_CODE_ADD_DIALOG = 55;
 
-    public DialogFragment(){
+    private static final int DELAY_INSERT_UPDATE = 2000;
+    private static final int DELAY_GET_FROM_SOURCE = 7000;
 
-    }
+    public DialogFragment(){}
 
     public static DialogFragment newInstance(String title, int menu_id) {
         DialogFragment fragment = new DialogFragment();
@@ -61,9 +69,6 @@ public class DialogFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        initRecyclerView(view);
-        List<DialogItem> dialogItems = getPreviousDialogItems();
-        adapter.setItems(dialogItems);
         addDialog = (Button) view.findViewById(R.id.add_dialog);
         addDialog.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,20 +77,36 @@ public class DialogFragment extends Fragment {
             }
         });
 
+        this.mView = view;
+
         return view;
     }
 
-    private void initRecyclerView(View view) {
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_dialogs);
+    /** init LoadManager here: https://developer.android.com/reference/android/app/LoaderManager.html
+     * */
+    @Override public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        //start spinning and get the data
+        showProgressLoader();
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    private void initRecyclerView(List<DialogItem> dataSet) {
+        recyclerView = (RecyclerView) mView.findViewById(R.id.recycler_view_dialogs);
         recyclerView.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new DialogAdapter(new ArrayList<DialogItem>(), new OnItemClickListener() {
+        adapter = new DialogAdapter(dataSet, new OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Toast.makeText(getActivity(), "Dialog id (DB) = " + adapter.getItemId(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),
+                        getString(R.string.dialog_toast_id) + adapter.getItemId(position),
+                        Toast.LENGTH_SHORT).show();
+
+                //get dialog's ID from DB (adapter) and give it to Chat
                 long chatId = adapter.getItemId(position);
                 mCallback.startChatScreen(chatId);
             }
@@ -98,7 +119,6 @@ public class DialogFragment extends Fragment {
     /** Start DialogAddActivity with "Compound View" to retrieve Title & Description of the new Dialog
      * */
     private void addDialogItem() {
-
         Intent intent = new Intent(getActivity(), DialogAddActivity.class);
         startActivityForResult(intent, REQUEST_CODE_ADD_DIALOG);
     }
@@ -114,34 +134,72 @@ public class DialogFragment extends Fragment {
                 if(data.hasExtra(EXTRA_DIALOG_TITLE) && data.hasExtra(EXTRA_DIALOG_DESCR)) {
 
                     DialogItem dialogItem = new DialogItem(
-                            "Title is " + data.getStringExtra(EXTRA_DIALOG_TITLE),
-                            "Description is " + data.getStringExtra(EXTRA_DIALOG_DESCR));
-                    FlowManager.getModelAdapter(DialogItem.class).save(dialogItem);
-                    adapter.addDialog(dialogItem);
+                            data.getStringExtra(EXTRA_DIALOG_TITLE),
+                            data.getStringExtra(EXTRA_DIALOG_DESCR));
+                    updateDialogs(dialogItem);
                 }
             }
         }
     }
 
-    List<DialogItem> itemList;
+    private void updateDialogs(final DialogItem dialogItem){
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable(){
+            @Override
+            public void run(){
+                FlowManager.getModelAdapter(DialogItem.class).save(dialogItem);
+                adapter.addDialog(dialogItem);
+                adapter.notifyDataSetChanged();
+            }
+        }, DELAY_INSERT_UPDATE);
+    }
+
+    @Override
+    public Loader<List<DialogItem>> onCreateLoader(int id, Bundle args) {
+
+        Loader<List<DialogItem>> mLoader = new Loader<List<DialogItem>>(getActivity()){
+            @Override
+            protected void onStartLoading() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(DELAY_GET_FROM_SOURCE);
+                        }catch (InterruptedException ex){
+                            ex.printStackTrace();
+                        }
+                        deliverResult(getPreviousDialogItems());
+                    }
+                }).start();
+            }
+
+            @Override
+            protected void onStopLoading() {}
+        };
+
+        return mLoader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<DialogItem>> loader, final List<DialogItem> data) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                initRecyclerView(data);
+                hideProgressLoader();
+            }
+        });
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<DialogItem>> loader) {}
+
     @NonNull
     private List<DialogItem> getPreviousDialogItems() {
-        List<DialogItem> itemList = SQLite.select().from(DialogItem.class).queryList();
-
-        /*
-        DatabaseDefinition database = FlowManager.getDatabase(FintechChatDatabase.class);
-        Transaction transaction = database.beginTransactionAsync(new ITransaction() {
-            @Override
-            public void execute(DatabaseWrapper databaseWrapper) {
-                //called.set(true);
-                itemList = SQLite.select().from(DialogItem.class).queryList();
-            }
-        }).build();
-        transaction.execute(); // execute
-
-        transaction.cancel();
-        */
-
+        List<DialogItem> itemList = SQLite.select()
+                .from(DialogItem.class)
+                .queryList();
+        //itemList is redundant, but useful while debugging
         return itemList;
     }
 
@@ -161,6 +219,19 @@ public class DialogFragment extends Fragment {
 
     public interface OnLoadChat{
         void startChatScreen(long position);
+    }
+
+    /** ProgressDialog - show & hide */
+    public void showProgressLoader(){
+        progress4Dialogs = new ProgressDialog(getActivity());
+        progress4Dialogs.setTitle(getString(R.string.dialog_progress_title));
+        progress4Dialogs.setMessage(getString(R.string.dialog_progress_message));
+        progress4Dialogs.setCancelable(false);
+        progress4Dialogs.show();
+    }
+
+    public void hideProgressLoader(){
+        progress4Dialogs.dismiss();
     }
 
 }

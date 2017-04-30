@@ -39,6 +39,7 @@ public class DialogItem {
         this.creation_time = df.format(Calendar.getInstance().getTime());
     }
 
+    //may be we need specify special TIME
     public DialogItem(String title, String desc, String creation_time) {
         this.title = title;
         this.desc = desc;

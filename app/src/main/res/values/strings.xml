@@ -7,7 +7,7 @@
     <string name="edit_login_hint">Insert login...</string>
     <string name="edit_pass_hint">Insert password...</string>
     <string name="enter">Login!</string>
-    <string name="login_problem">"У тебя проблемы"</string>
+    <string name="login_problem">All fields important!</string>
 
 
     <!-- Menu -->
@@ -26,6 +26,9 @@
 
     <!-- Dialog list -->
     <string name="dialogs_list_add">Add new dialog</string>
+    <string name="dialog_progress_title">Loading... </string>
+    <string name="dialog_progress_message">...list of dialogs</string>
+    <string name="dialog_toast_id">Dialog id (DB) = </string>
 
     <!-- Dialog Add Activity -->
     <string name="dialog_add_title_hint">Enter Title</string>
@@ -33,6 +36,10 @@
     <string name="dialog_add_button">Add</string>
 
     <!-- Chat -->
+    <string name="chat_fragment_set_title">Chat-</string>
+    <string name="chat_progress_title">Loading... </string>
+    <string name="chat_progress_message">...list of messages</string>
+    <string name="chat_toast_id">Message id (from DB) = </string>
     <string name="chat_send_message_edittext_hint">Start typing!</string>
     <string name="chat_send_message_button">Send!</string>
 

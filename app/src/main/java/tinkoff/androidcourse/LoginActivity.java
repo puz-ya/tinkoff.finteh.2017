@@ -6,26 +6,23 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
 
 import tinkoff.androidcourse.model.PrefManager;
-import tinkoff.androidcourse.ui.widgets.ProgressButton;
 
-public class LoginActivity extends AppCompatActivity implements LoginFragment.LoginListener {
-
-    // Service extras
-    public static final String PENDING_INTENT = "pi";
-    public static final String EXTRA_SUCCESS = "extra_success";
+public class LoginActivity extends AppCompatActivity
+        implements LoginFragment.LoginListener {
 
     // NavigationActivity extras
     public static final String EXTRA_LOGIN = "extra_login_set";
 
+    /* moved to fragment
     private EditText login;
     private EditText password;
     private ProgressButton button;
+    */
 
     private LoginFragment loginFragment;
 
@@ -36,16 +33,12 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
         setContentView(R.layout.activity_login);
 
         //we skip Login check if we already logged
-        //needed more secure check
+        //TODO: needed more secure check
         if(PrefManager.getInstance().loggedIn() && !PrefManager.getInstance().login().isEmpty()){
             startNextScreen();
         }else{
 
-            login = (EditText) findViewById(R.id.edit_text_login);
-            password = (EditText) findViewById(R.id.edit_text_password);
-
-            login.setText(PrefManager.getInstance().login());
-
+            //get fragment, replace it
             FragmentManager supportFragmentManager = getSupportFragmentManager();
             if (savedInstanceState != null) {
                 loginFragment = (LoginFragment) supportFragmentManager.findFragmentByTag(LoginFragment.TAG);
@@ -56,6 +49,13 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
                 createLoginFragment(supportFragmentManager);
             }
 
+            /* Attempt to save state of Progress button in retain fragment - fail by 2017.04.30
+
+            login = (EditText) findViewById(R.id.edit_text_login);
+            password = (EditText) findViewById(R.id.edit_text_password);
+
+            login.setText(PrefManager.getInstance().login());
+
             button = (ProgressButton) findViewById(R.id.btn_enter);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -64,9 +64,11 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
                     new LoginTask(loginFragment).execute(new String[]{login.getText().toString(),password.getText().toString()});
                 }
             });
+            */
         }
     }
 
+    /* moved to fragment
     public void showProgress() {
         button.showProgress();
     }
@@ -74,6 +76,7 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
     public void hideProgress() {
         button.hideProgress();
     }
+    */
 
     @Override
     public void onResult(Boolean success) {
@@ -81,7 +84,7 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
             PrefManager.getInstance().saveLoggedIn(true);
             startNextScreen();
         } else {
-            hideProgress();
+            loginFragment.reset();
             new LoginActivity.MyDialogFragment().show(getSupportFragmentManager(), null);
         }
     }
@@ -95,7 +98,9 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Lo
 
     private void createLoginFragment(FragmentManager supportFragmentManager) {
         loginFragment = new LoginFragment();
-        supportFragmentManager.beginTransaction().add(loginFragment, LoginFragment.TAG).commit();
+        FragmentTransaction fragmentTransaction = supportFragmentManager.beginTransaction();
+        fragmentTransaction = fragmentTransaction.replace(R.id.content_login, loginFragment, LoginFragment.TAG);
+        fragmentTransaction.commit();
     }
 
     public static class MyDialogFragment extends DialogFragment {
