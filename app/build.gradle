@@ -55,6 +55,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:recyclerview-v7:25.2.0'
     testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.7.22'
 
     annotationProcessor "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"
     compile "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
