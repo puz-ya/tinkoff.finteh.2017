@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -67,6 +69,24 @@ public class ProgressButton extends FrameLayout implements View.OnTouchListener 
         textView.setEnabled(enabled);
     }
 
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        SavedState savedState = new SavedState(super.onSaveInstanceState());
+        savedState.clickable = isClickable();
+        savedState.textViewVisibility = textView.getVisibility();
+        savedState.progressBarVisibility = progressBar.getVisibility();
+        return savedState;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        super.onRestoreInstanceState(state);
+        SavedState ss = (SavedState) state;
+        setClickable(ss.clickable);
+        textView.setVisibility(ss.textViewVisibility);
+        progressBar.setVisibility(ss.progressBarVisibility);
+    }
+
     public void setText(String text) {
         textView.setText(text);
     }
@@ -81,5 +101,39 @@ public class ProgressButton extends FrameLayout implements View.OnTouchListener 
         textView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
         this.setClickable(true);
+    }
+
+    private static class SavedState extends BaseSavedState {
+        boolean clickable;
+        int textViewVisibility;
+        int progressBarVisibility;
+        public SavedState(Parcelable source) {
+            super(source);
+        }
+
+        private SavedState(Parcel in) {
+            super(in);
+            clickable = in.readInt() == 1;
+            textViewVisibility = in.readInt();
+            progressBarVisibility = in.readInt();
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeInt(clickable ? 1 : 0);
+            out.writeInt(textViewVisibility);
+            out.writeInt(progressBarVisibility);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR =
+                new Parcelable.Creator<SavedState>() {
+                    public SavedState createFromParcel(Parcel in) {
+                        return new SavedState(in);
+                    }
+                    public SavedState[] newArray(int size) {
+                        return new SavedState[size];
+                    }
+                };
     }
 }

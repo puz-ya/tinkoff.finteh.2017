@@ -5,7 +5,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
-import tinkoff.androidcourse.LoginActivity;
+import tinkoff.androidcourse.login.LoginActivity;
 
 import static android.app.Activity.RESULT_OK;
 

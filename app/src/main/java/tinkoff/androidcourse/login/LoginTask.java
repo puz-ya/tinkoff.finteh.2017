@@ -1,4 +1,4 @@
-package tinkoff.androidcourse;
+package tinkoff.androidcourse.login;
 
 import android.os.AsyncTask;
 
@@ -9,21 +9,26 @@ import tinkoff.androidcourse.model.PrefManager;
  */
 class LoginTask extends AsyncTask<String[], Void, Boolean> {
 
-    private LoginFragment loginFragment;
+    private LoginPresenter loginPresenter;
 
-    public LoginTask(LoginFragment loginFragment) {
-        this.loginFragment = loginFragment;
+    public LoginTask(LoginPresenter loginFragment) {
+        this.loginPresenter = loginFragment;
     }
 
     @Override
     protected Boolean doInBackground(String[]... credentials) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         PrefManager.getInstance().saveLogin(credentials[0][0]);
         return true;
     }
 
     @Override
     protected void onPostExecute(Boolean success) {
-        loginFragment.setSuccess(success);
+        loginPresenter.setAuthorizationResult(success);
     }
 }
 
