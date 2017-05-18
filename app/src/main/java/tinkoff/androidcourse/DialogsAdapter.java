@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import tinkoff.androidcourse.model.DialogItem;
+
 public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHolder> {
 
     private List<DialogItem> dataset;
@@ -33,6 +35,11 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
     @Override
     public int getItemCount() {
         return dataset.size();
+    }
+
+    public void setItems(List<DialogItem> items) {
+        this.dataset = items;
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

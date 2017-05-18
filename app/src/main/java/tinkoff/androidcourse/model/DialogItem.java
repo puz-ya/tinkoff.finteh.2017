@@ -1,9 +1,13 @@
-package tinkoff.androidcourse;
+package tinkoff.androidcourse.model;
 
 public class DialogItem {
 
     private String title;
     private String desc;
+
+    public DialogItem() {
+        //for firebase
+    }
 
     public DialogItem(String title, String desc) {
         this.title = title;

@@ -10,6 +10,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import tinkoff.androidcourse.model.DialogItem;
+
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
