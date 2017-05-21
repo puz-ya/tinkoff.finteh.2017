@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/customProgressButton"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="40dp">
 
     <View
-        android:id="@+id/view_background"
+        android:id="@+id/custom_PB_background"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/selector_button_green" />
 
     <TextView
-        android:id="@+id/text_view"
+        android:id="@+id/custom_PB_textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -25,7 +26,7 @@
         tools:ignore="MissingPrefix" />
 
     <ProgressBar
-        android:id="@+id/progress_bar"
+        android:id="@+id/custom_PB_progressbar"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="center"
