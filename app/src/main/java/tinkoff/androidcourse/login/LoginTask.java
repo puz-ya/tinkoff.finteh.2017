@@ -1,8 +1,8 @@
-package tinkoff.androidcourse;
+package tinkoff.androidcourse.login;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
+import tinkoff.androidcourse.login.LoginFragment;
 import tinkoff.androidcourse.model.PrefManager;
 
 /**

@@ -1,4 +1,4 @@
-package tinkoff.androidcourse;
+package tinkoff.androidcourse.login;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -10,6 +10,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import tinkoff.androidcourse.NavigationActivity;
+import tinkoff.androidcourse.R;
 import tinkoff.androidcourse.model.PrefManager;
 
 public class LoginActivity extends AppCompatActivity

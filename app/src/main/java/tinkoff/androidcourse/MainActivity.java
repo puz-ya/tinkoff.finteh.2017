@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
+import tinkoff.androidcourse.login.LoginActivity;
+
 /**
  * Created on 04.2017
  * @author Puzino Yury
