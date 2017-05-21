@@ -2,7 +2,6 @@ package tinkoff.androidcourse.login;
 
 import android.os.AsyncTask;
 
-import tinkoff.androidcourse.login.LoginFragment;
 import tinkoff.androidcourse.model.PrefManager;
 
 /**
@@ -10,11 +9,12 @@ import tinkoff.androidcourse.model.PrefManager;
  */
 class LoginTask extends AsyncTask<String[], Void, Boolean> {
 
-    private LoginFragment loginFragment;
+    //private LoginFragment loginFragment;
+    private LoginPresenter loginPresenter;
     private static final int DELAY = 10000;
 
-    public LoginTask(LoginFragment loginFragment) {
-        this.loginFragment = loginFragment;
+    public LoginTask(LoginPresenter loginPresenter) {
+        this.loginPresenter = loginPresenter;
     }
 
     @Override
@@ -38,7 +38,7 @@ class LoginTask extends AsyncTask<String[], Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean success) {
-        loginFragment.setSuccess(success);
+        loginPresenter.setAuthResult(success);
     }
 }
 

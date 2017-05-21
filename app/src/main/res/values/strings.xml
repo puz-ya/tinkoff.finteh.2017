@@ -7,7 +7,7 @@
     <string name="edit_login_hint">Insert login...</string>
     <string name="edit_pass_hint">Insert password...</string>
     <string name="enter">Login!</string>
-    <string name="login_problem">All fields important!</string>
+    <string name="login_problem">All fields are important!</string>
 
 
     <!-- Menu -->

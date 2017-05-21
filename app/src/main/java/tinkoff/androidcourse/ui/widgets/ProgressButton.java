@@ -82,4 +82,10 @@ public class ProgressButton extends FrameLayout implements View.OnTouchListener 
         progressBar.setVisibility(View.GONE);
         this.setClickable(true);
     }
+
+    /*
+    HOWTO set & get CustomView state
+    http://stackoverflow.com/questions/3542333/how-to-prevent-custom-views-from-losing-state-across-screen-orientation-changes
+     */
+
 }
