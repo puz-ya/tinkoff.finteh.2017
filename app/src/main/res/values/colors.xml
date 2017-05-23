@@ -4,9 +4,50 @@
     <color name="colorAccent">#ab627d</color>
 
     <color name="green_light">#d9f8b5</color>
+    <!--
     <color name="green">#aed581</color>
+    -->
     <color name="green_dark">#76b132</color>
 
     <color name="grey">#333333</color>
     <color name="grey_light">#80333333</color>
+
+    <item name="blue" type="color">#FF33B5E5</item>
+    <item name="purple" type="color">#FFAA66CC</item>
+    <item name="green" type="color">#FF99CC00</item>
+    <item name="orange" type="color">#FFFFBB33</item>
+    <item name="red" type="color">#FFFF4444</item>
+
+    <item name="dark_blue" type="color">#FF0099CC</item>
+    <item name="dark_purple" type="color">#FF9933CC</item>
+    <item name="dark_green" type="color">#FF669900</item>
+    <item name="dark_orange" type="color">#FFFF8800</item>
+    <item name="dark_red" type="color">#FFCC0000</item>
+
+    <item name="dark_orange2" type="color">#ec9c21</item>
+    <!-- Material Design Orange -->
+    <item name="orange_50" type="color">#fff3e0</item>
+    <item name="orange_100" type="color">#ffe0b2</item>
+    <item name="orange_200" type="color">#ffcc80</item>
+    <item name="orange_300" type="color">#ffb74d</item>
+    <item name="orange_400" type="color">#ffa726</item>
+    <item name="orange_500" type="color">#ff9800</item>
+    <item name="orange_600" type="color">#fb8c00</item>
+    <item name="orange_700" type="color">#f57c00</item>
+    <item name="orange_800" type="color">#ef6c00</item>
+    <item name="orange_900" type="color">#e65100</item>
+
+    <item name="grey_yp" type="color">#e5eeeeee</item>
+    <item name="grey_yp_400" type="color">#e5bdbdbd</item>
+    <!-- Material Design Grey -->
+    <item name="grey_50" type="color">#fafafa</item>
+    <item name="grey_100" type="color">#f5f5f5</item>
+    <item name="grey_200" type="color">#eeeeee</item>
+    <item name="grey_300" type="color">#e0e0e0</item>
+    <item name="grey_400" type="color">#bdbdbd</item>
+    <item name="grey_500" type="color">#9e9e9e</item>
+    <item name="grey_600" type="color">#757575</item>
+    <item name="grey_700" type="color">#616161</item>
+    <item name="grey_800" type="color">#424242</item>
+    <item name="grey_900" type="color">#212121</item>
 </resources>

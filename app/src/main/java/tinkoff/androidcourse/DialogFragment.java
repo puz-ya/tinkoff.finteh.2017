@@ -23,6 +23,7 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.List;
 
+import tinkoff.androidcourse.dialogsAdd.DialogAddActivity;
 import tinkoff.androidcourse.model.db.DialogItem;
 
 import static android.app.Activity.RESULT_OK;
@@ -46,8 +47,8 @@ public class DialogFragment extends Fragment
     public static final String EXTRA_DIALOG_DESCR = "DIALOG_DESCR";
     private static final int REQUEST_CODE_ADD_DIALOG = 55;
 
-    private static final int DELAY_INSERT_UPDATE = 2000;
-    private static final int DELAY_GET_FROM_SOURCE = 7000;
+    private static final int DELAY_INSERT_UPDATE = 1000;
+    private static final int DELAY_GET_FROM_SOURCE = 3000;
 
     public DialogFragment(){}
 

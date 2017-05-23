@@ -26,9 +26,6 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
     private EditText login;
     private EditText password;
     private ProgressButton button;
-    //*/
-
-    //private LoginFragment loginFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,19 +38,6 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
         if(PrefManager.getInstance().loggedIn() && !PrefManager.getInstance().login().isEmpty()){
             redirectToNavigation();
         }else{
-
-            /*
-            //get fragment, replace it
-            FragmentManager supportFragmentManager = getSupportFragmentManager();
-            if (savedInstanceState != null) {
-                loginFragment = (LoginFragment) supportFragmentManager.findFragmentByTag(LoginFragment.TAG);
-                if (loginFragment == null) {
-                    createLoginFragment(supportFragmentManager);
-                }
-            } else {
-                createLoginFragment(supportFragmentManager);
-            }
-            //*/
 
             login = (EditText) findViewById(R.id.edit_text_login);
             password = (EditText) findViewById(R.id.edit_text_password);
@@ -102,15 +86,6 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
-
-    /*
-    private void createLoginFragment(FragmentManager supportFragmentManager) {
-        loginFragment = new LoginFragment();
-        FragmentTransaction fragmentTransaction = supportFragmentManager.beginTransaction();
-        fragmentTransaction = fragmentTransaction.replace(R.id.content_login, loginFragment, LoginFragment.TAG);
-        fragmentTransaction.commit();
-    }
-    */
 
     public static class MyDialogFragment extends DialogFragment {
 

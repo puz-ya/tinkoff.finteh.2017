@@ -27,7 +27,7 @@
         <activity
             android:name=".NavigationActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".DialogAddActivity"></activity>
+        <activity android:name=".dialogsAdd.DialogAddActivity"></activity>
     </application>
 
 </manifest>

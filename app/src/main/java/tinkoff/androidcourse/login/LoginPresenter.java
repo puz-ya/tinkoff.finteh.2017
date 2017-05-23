@@ -24,8 +24,7 @@ public class LoginPresenter extends MvpBasePresenter<LoginView> {
         }
     }
 
-    /*
-    * setter
+    /* return method from LoginTask
     * */
     public void setAuthResult(Boolean authResult){
         if(isViewAttached()){
@@ -35,12 +34,15 @@ public class LoginPresenter extends MvpBasePresenter<LoginView> {
         }
     }
 
-    //
+    /* create Task to check input data
+    * */
     public void onLoginButtonClick(String login, String pass){
         LoginTask loginTask = new LoginTask(this);
         loginTask.execute(new String[]{login, pass});
     }
 
+    /* based on Boolean result, make a decision
+    * */
     @VisibleForTesting
     void onAuthResult(Boolean authResult){
         if(authResult){

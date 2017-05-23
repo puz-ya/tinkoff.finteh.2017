@@ -74,3 +74,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.8.9'
 }
+
+//apply plugin: 'com.google.gms.google-services'

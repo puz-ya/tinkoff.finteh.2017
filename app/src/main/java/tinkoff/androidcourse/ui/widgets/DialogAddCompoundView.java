@@ -1,6 +1,8 @@
 package tinkoff.androidcourse.ui.widgets;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.v4.content.res.ResourcesCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -65,6 +67,7 @@ public class DialogAddCompoundView extends LinearLayout {
                 }else{
                     button.setEnabled(false);
                 }
+                resetRedEdits();
             }
         });
 
@@ -83,6 +86,7 @@ public class DialogAddCompoundView extends LinearLayout {
                 }else{
                     button.setEnabled(false);
                 }
+                resetRedEdits();
             }
         });
     }
@@ -95,7 +99,34 @@ public class DialogAddCompoundView extends LinearLayout {
         return editTextDescript.getText().toString();
     }
 
+    public void setEditTextTitle(String editTextTitle) {
+        this.editTextTitle.setText(editTextTitle);
+    }
+
+    public void setEditTextDescript(String editTextDescript) {
+        this.editTextDescript.setText(editTextDescript);
+    }
+
     public Button getButton(){
         return button;
+    }
+
+    public void clearTexts(){
+        setEditTextTitle("");
+        setEditTextDescript("");
+    }
+
+    /* set background color of EditTexts to bright one (red) - error
+    * */
+    public void setRedEdits(int code){
+        editTextTitle.setBackgroundColor(Color.parseColor("#ff0000"));
+        editTextDescript.setBackgroundColor(Color.parseColor("#ff0000"));
+    }
+
+    /* reset background color of EditTexts to default
+    * */
+    public void resetRedEdits(){
+        editTextTitle.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.grey_100, null));
+        editTextDescript.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.grey_100, null));
     }
 }
