@@ -7,8 +7,8 @@
     <string name="edit_login_hint">Insert login...</string>
     <string name="edit_pass_hint">Insert password...</string>
     <string name="enter">Login!</string>
-    <string name="login_problem">All fields are important!</string>
-
+    <string name="login_problem">Login error: check your input!</string>
+    <string name="google_login_problem">Login error: check google account!</string>
 
     <!-- Menu -->
     <string name="menu_dialogs">Dialogs</string>

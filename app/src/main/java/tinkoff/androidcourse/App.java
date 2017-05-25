@@ -20,7 +20,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         PrefManager.newInstance(this);
-        //FlowManager.init(this); //init DBFlow ORM (raizlabs)
+        FlowManager.init(this); //init DBFlow ORM (raizlabs)
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
     }
 }
