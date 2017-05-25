@@ -24,6 +24,8 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 import java.util.List;
 
 import tinkoff.androidcourse.dialogsAdd.DialogAddActivity;
+import tinkoff.androidcourse.firebase.DialogRepository;
+import tinkoff.androidcourse.firebase.OnTransactionComplete;
 import tinkoff.androidcourse.model.db.DialogItem;
 
 import static android.app.Activity.RESULT_OK;
@@ -49,6 +51,8 @@ public class DialogFragment extends Fragment
 
     private static final int DELAY_INSERT_UPDATE = 1000;
     private static final int DELAY_GET_FROM_SOURCE = 3000;
+
+    private DialogRepository dialogRepository = DialogRepository.getInstance();
 
     public DialogFragment(){}
 
@@ -149,6 +153,20 @@ public class DialogFragment extends Fragment
             @Override
             public void run(){
                 FlowManager.getModelAdapter(DialogItem.class).save(dialogItem);
+                final OnTransactionComplete<Void> onTransactionComplete = new OnTransactionComplete() {
+
+                    @Override
+                    public void onCommit(Object result) {
+                        //finish();
+                    }
+
+                    @Override
+                    public void onAbort(Exception e) {
+                        Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
+                    };
+                };
+                dialogRepository.addDialog(dialogItem, onTransactionComplete);
+
                 adapter.addDialog(dialogItem);
                 adapter.notifyDataSetChanged();
             }
@@ -201,6 +219,9 @@ public class DialogFragment extends Fragment
                 .from(DialogItem.class)
                 .queryList();
         //itemList is redundant, but useful while debugging
+
+        //TODO: here we will get List from Firebase
+
         return itemList;
     }
 
