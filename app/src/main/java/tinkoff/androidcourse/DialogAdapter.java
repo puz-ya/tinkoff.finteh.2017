@@ -57,6 +57,18 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.ViewHolder
 
         public TextView title;
         public TextView desc;
+        View mView;
+
+        public ViewHolder(View view) {
+            super(view);
+            title = (TextView) view.findViewById(R.id.tv_dialog_title);
+            desc = (TextView) view.findViewById(R.id.tv_dialog_desc);
+            mView = view;
+        }
+
+        public View getmView() {
+            return mView;
+        }
 
         public ViewHolder(View view, OnItemClickListener listener) {
             super(view);
@@ -74,6 +86,14 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.ViewHolder
                     }
                 }
             });
+        }
+
+        public void setTitle(String title) {
+            this.title.setText(title);
+        }
+
+        public void setDesc(String desc) {
+            this.desc.setText(desc);
         }
     }
 }

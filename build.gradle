@@ -19,7 +19,13 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        maven { url "https://www.jitpack.io" }
+        maven {
+            url "https://www.jitpack.io"
+        }
+        // Required for 'com.firebaseui:firebase-ui'
+        maven {
+            url "https://maven.fabric.io/public"
+        }
     }
 }
 

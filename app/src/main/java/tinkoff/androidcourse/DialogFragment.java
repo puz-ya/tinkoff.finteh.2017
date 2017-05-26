@@ -18,6 +18,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
@@ -38,6 +41,8 @@ public class DialogFragment extends Fragment
 
     private RecyclerView recyclerView;
     private DialogAdapter adapter;
+    public FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder> FBadapter;
+
     private Button addDialog;
 
     OnLoadChat mCallback;
@@ -116,7 +121,35 @@ public class DialogFragment extends Fragment
                 mCallback.startChatScreen(chatId);
             }
         });
-        recyclerView.setAdapter(adapter);
+
+        //set Firebase adapter
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("dialogs");
+        FBadapter = new FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder>(
+                DialogItem.class, R.layout.item_chat_dialog, DialogAdapter.ViewHolder.class, ref
+        ){
+            @Override
+            public void populateViewHolder(DialogAdapter.ViewHolder viewHolder, DialogItem model, final int FBpos) {
+                viewHolder.setTitle(model.getTitle());
+                viewHolder.setDesc(model.getDesc());
+
+                viewHolder.getmView().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(getActivity(),
+                                getString(R.string.dialog_toast_id) + FBadapter.getItem(FBpos).getId(),
+                                Toast.LENGTH_SHORT).show();
+
+                        //get dialog's ID from DB (adapter) and give it to Chat
+                        long chatId = FBadapter.getItem(FBpos).getId();
+                        mCallback.startChatScreen(chatId);
+                    }
+                });
+            }
+
+        };
+
+        //set adapter to RecyclerView
+        recyclerView.setAdapter(FBadapter);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), layoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
