@@ -13,5 +13,6 @@ public interface LoginView extends MvpView{
     // if OK -> showing NavigationActivity
     void redirectToNavigation();
     // if FAIL -> show error dialog (toast \ snack \ alert)
-    void showFailedAuth();
+    void showFailedAuth();  //default text
+    void showFailedAuth(String text);
 }

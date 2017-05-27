@@ -41,7 +41,7 @@ public class DialogFragment extends Fragment
 
     private RecyclerView recyclerView;
     private DialogAdapter adapter;
-    public FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder> FBadapter;
+    public FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder> adapterFB;
 
     private Button addDialog;
 
@@ -109,22 +109,24 @@ public class DialogFragment extends Fragment
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
+        //set DB adapter
         adapter = new DialogAdapter(dataSet, new OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Toast.makeText(getActivity(),
-                        getString(R.string.dialog_toast_id) + adapter.getItemId(position),
-                        Toast.LENGTH_SHORT).show();
 
                 //get dialog's ID from DB (adapter) and give it to Chat
                 long chatId = adapter.getItemId(position);
+                Toast.makeText(getActivity(),
+                        getString(R.string.dialog_toast_id) + chatId,
+                        Toast.LENGTH_SHORT).show();
+
                 mCallback.startChatScreen(chatId);
             }
         });
 
         //set Firebase adapter
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("dialogs");
-        FBadapter = new FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder>(
+        adapterFB = new FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder>(
                 DialogItem.class, R.layout.item_chat_dialog, DialogAdapter.ViewHolder.class, ref
         ){
             @Override
@@ -135,12 +137,13 @@ public class DialogFragment extends Fragment
                 viewHolder.getmView().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+
+                        //get dialog's ID from FB adapter and give it to Chat
+                        long chatId = adapterFB.getItem(FBpos).getId();
                         Toast.makeText(getActivity(),
-                                getString(R.string.dialog_toast_id) + FBadapter.getItem(FBpos).getId(),
+                                getString(R.string.dialog_fb_toast_id) + chatId,
                                 Toast.LENGTH_SHORT).show();
 
-                        //get dialog's ID from DB (adapter) and give it to Chat
-                        long chatId = FBadapter.getItem(FBpos).getId();
                         mCallback.startChatScreen(chatId);
                     }
                 });
@@ -149,7 +152,7 @@ public class DialogFragment extends Fragment
         };
 
         //set adapter to RecyclerView
-        recyclerView.setAdapter(FBadapter);
+        recyclerView.setAdapter(adapterFB);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), layoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
@@ -185,11 +188,17 @@ public class DialogFragment extends Fragment
         handler.postDelayed(new Runnable(){
             @Override
             public void run(){
+
+                //add to DB
                 FlowManager.getModelAdapter(DialogItem.class).save(dialogItem);
-                final OnTransactionComplete<Void> onTransactionComplete = new OnTransactionComplete() {
+                adapter.addDialog(dialogItem);
+                adapter.notifyDataSetChanged();
+
+                //add to FB
+                final OnTransactionComplete<Void> onTransactionComplete = new OnTransactionComplete<Void>() {
 
                     @Override
-                    public void onCommit(Object result) {
+                    public void onCommit(Void v) {
                         //finish();
                     }
 
@@ -200,8 +209,6 @@ public class DialogFragment extends Fragment
                 };
                 dialogRepository.addDialog(dialogItem, onTransactionComplete);
 
-                adapter.addDialog(dialogItem);
-                adapter.notifyDataSetChanged();
             }
         }, DELAY_INSERT_UPDATE);
     }

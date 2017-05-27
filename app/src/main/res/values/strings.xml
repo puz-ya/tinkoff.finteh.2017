@@ -9,6 +9,11 @@
     <string name="enter">Login!</string>
     <string name="login_problem">Login error: check your input!</string>
     <string name="google_login_problem">Login error: check google account!</string>
+    <string name="google_signin_intent_failed">Google signin intent failed! Check your connection.</string>
+    <string name="google_signin_cancelled">Google signin cancelled!</string>
+    <string name="google_signin_failed">Google signin failed!</string>
+    <string name="firebase_signin_failed">Firebase signin failed! Check your connection.</string>
+    <string name="firebase_user_notfound">Firebase user not found.</string>
 
     <!-- Menu -->
     <string name="menu_dialogs">Dialogs</string>
@@ -29,6 +34,7 @@
     <string name="dialog_progress_title">Loading... </string>
     <string name="dialog_progress_message">...list of dialogs</string>
     <string name="dialog_toast_id">Dialog id (DB) = </string>
+    <string name="dialog_fb_toast_id">Dialog id (FB) = </string>
 
     <!-- Dialog Add Activity -->
     <string name="dialog_add_title_hint">Enter Title</string>

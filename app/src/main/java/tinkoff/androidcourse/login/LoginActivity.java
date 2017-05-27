@@ -1,5 +1,6 @@
 package tinkoff.androidcourse.login;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,6 +30,9 @@ import tinkoff.androidcourse.NavigationActivity;
 import tinkoff.androidcourse.R;
 import tinkoff.androidcourse.model.PrefManager;
 import tinkoff.androidcourse.ui.widgets.ProgressButton;
+
+import static com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes.SIGN_IN_CANCELLED;
+import static com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes.SIGN_IN_FAILED;
 
 public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
         implements LoginView, GoogleApiClient.OnConnectionFailedListener {
@@ -118,16 +122,25 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
     @Override
     public void showFailedAuth() {
         hideProgress();
-        Bundle bundle = new Bundle();
-        bundle.putString(AUTH_ERROR_TEXT, getString(R.string.google_login_problem));
 
-        MyDialogFragment myDialogFragment = new LoginActivity.MyDialogFragment();
-        myDialogFragment.setArguments(bundle);
-        myDialogFragment.show(getSupportFragmentManager(), null);
+        DialogFragment newFragment = MyDialogFragment.newInstance(
+                getString(R.string.login_problem)
+        );
+        newFragment.show(getSupportFragmentManager(), null);
+    }
+
+    @Override
+    public void showFailedAuth(String failText) {
+        hideProgress();
+
+        DialogFragment newFragment = MyDialogFragment.newInstance(
+                failText
+        );
+        newFragment.show(getSupportFragmentManager(), null);
     }
 
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        showFailedAuth();
+        showFailedAuth(getString(R.string.google_login_problem));
     }
 
     @Override
@@ -145,18 +158,33 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
 
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == G00GLE_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
+            if (resultCode == RESULT_OK) {
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                handleSignInResult(result);
+            } else {
+                showFailedAuth(getString(R.string.google_signin_intent_failed));
+            }
         }
     }
 
     /** GOOGLE AUTH PART */
 
-    /** try firebase auth after success */
+    /** try firebase auth after google auth success */
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
             firebaseAuth(acct);
+        }else{
+            switch (result.getStatus().getStatusCode()){
+                // sign in was cancelled by the user
+                case SIGN_IN_CANCELLED:
+                    showFailedAuth(getString(R.string.google_signin_cancelled));
+                    break;
+                //when seeing this error code, there is nothing user can do to recover from the sign in failure :D
+                case SIGN_IN_FAILED:
+                    showFailedAuth(getString(R.string.google_signin_failed));
+                    break;
+            }
         }
 
     }
@@ -169,18 +197,20 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
 
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                AuthResult result = task.getResult();
-                FirebaseUser user = result.getUser();
+                if (task.isSuccessful()) {
+                    // get info if success
+                    AuthResult result = task.getResult();
+                    FirebaseUser user = result.getUser();
 
-                if (user != null) {
+                    if (user != null) {
                         PrefManager.getInstance().saveLogin(user.getDisplayName());
                         redirectToNavigation();
-                } else {
-                    MyDialogFragment myDialogFragment = new LoginActivity.MyDialogFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putString(AUTH_ERROR_TEXT, getString(R.string.google_login_problem));
-                    myDialogFragment.setArguments(bundle);
-                    myDialogFragment.show(getSupportFragmentManager(), null);
+                    } else {
+                        showFailedAuth(getString(R.string.firebase_user_notfound));
+                    }
+                }else{
+                    // If sign in fails
+                    showFailedAuth(getString(R.string.firebase_signin_failed));
                 }
             }
 
@@ -193,7 +223,6 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
     private void googleSignIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(client);
         startActivityForResult(signInIntent, G00GLE_SIGN_IN);
-
     }
 
     /*
@@ -201,17 +230,23 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
     * */
     public static class MyDialogFragment extends DialogFragment {
 
+        public static MyDialogFragment newInstance(String title) {
+            MyDialogFragment frag = new MyDialogFragment();
+            Bundle args = new Bundle();
+            args.putString("title", title);
+            frag.setArguments(args);
+            return frag;
+        }
+
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Dialog dialog = super.onCreateDialog(savedInstanceState);
-            Bundle bundle=getArguments();
+            String title = getArguments().getString("title");
 
-            if(bundle != null) {
-                String msg = bundle.getString(AUTH_ERROR_TEXT);
-                dialog.setTitle(msg);
-            }
-            return dialog;
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            return builder
+                    .setMessage(title)
+                    .create();
         }
 
     }

@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import tinkoff.androidcourse.login.LoginActivity;
 import tinkoff.androidcourse.model.PrefManager;
 
@@ -168,6 +170,7 @@ public class NavigationActivity extends AppCompatActivity
     private void logOut(){
 
         PrefManager.getInstance().saveLoggedIn(false);
+        FirebaseAuth.getInstance().signOut();
 
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);

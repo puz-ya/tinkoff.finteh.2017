@@ -22,6 +22,7 @@ import tinkoff.androidcourse.ui.widgets.DialogAddCompoundView;
 public class DialogAddActivity extends MvpActivity<DialogAddView, DialogAddPresenter>
     implements DialogAddView {
 
+    //simple compound of edittexts & button as one
     private DialogAddCompoundView compoundView;
 
     @Override
@@ -30,13 +31,10 @@ public class DialogAddActivity extends MvpActivity<DialogAddView, DialogAddPrese
         setContentView(R.layout.activity_dialog_add);
 
         compoundView = (DialogAddCompoundView) findViewById(R.id.dialog_add_compound_view);
-
         compoundView.getButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 presenter.onCheckInput(compoundView.getTitleText(), compoundView.getDescriptionText());
-
             }
         });
 
