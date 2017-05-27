@@ -51,8 +51,8 @@ public final class FintechChatDatabase {
 
             Cursor cursor_messages = database.rawQuery(
                     "SELECT MAX(id), text, id_dialog " +
-                            "FROM MessageItem " +
-                            "GROUP BY id_dialog", null);
+                            " FROM MessageItem " +
+                            " GROUP BY id_dialog ", null);
 
             List<String> lastMess = new ArrayList<>();
             List<Long> lastIdDialog = new ArrayList<>();

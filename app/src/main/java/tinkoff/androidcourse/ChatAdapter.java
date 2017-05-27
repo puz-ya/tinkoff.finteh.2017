@@ -59,7 +59,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewChatHolder
     public void onBindViewHolder(ChatAdapter.ViewChatHolder holder, int position) {
         holder.text.setText(dataset.get(position).getText());
         holder.time.setText(dataset.get(position).getCreation_time());
-        holder.userId.setText(String.format(Locale.getDefault(),"%d", dataset.get(position).getId_author()) );
+        holder.userId.setText(String.format(Locale.getDefault(),"%s", dataset.get(position).getId_author()) );
     }
 
     @Override
@@ -73,19 +73,20 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewChatHolder
     }
 
     public void addMessage(MessageItem messageItem) {
-        //Collections.reverse(dataset);
         dataset.add(0, messageItem);
         notifyItemInserted(0);
     }
 
-    /* get correct type based on User */
+    /* get correct type based on User
+    * in version with local DB users was not defined, so it was only 1 user with id == "1"
+    * */
     @Override
     public int getItemViewType(int position) {
 
         MessageItem messageItem = dataset.get(position);
 
         if (messageItem != null){
-            if(messageItem.getId_author() == 1){
+            if(messageItem.getId_author().equals("1")){
                 return USER_MESSAGE;
             }
             return OTHERS_MESSAGE;
@@ -104,6 +105,40 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewChatHolder
         public TextView text;
         public TextView time;
         public TextView userId;
+        public String gID;
+        View mView;
+
+        public ViewChatHolder(View view) {
+            super(view);
+            this.text = (TextView) view.findViewById(R.id.tv_message_text);
+            this.time = (TextView) view.findViewById(R.id.tv_message_time);
+            this.userId = (TextView) view.findViewById(R.id.tv_message_username);
+            this.mView = view;
+        }
+
+        public View getmView() {
+            return mView;
+        }
+
+        public void setText(String text) {
+            this.text.setText(text);
+        }
+
+        public void setTime(String time) {
+            this.time.setText(time);
+        }
+
+        public void setUserId(String userId) {
+            this.userId.setText(userId);
+        }
+
+        public String getgID() {
+            return gID;
+        }
+
+        public void setgID(String gID) {
+            this.gID = gID;
+        }
 
         public ViewChatHolder(View view, OnItemClickListener listener) {
             super(view);

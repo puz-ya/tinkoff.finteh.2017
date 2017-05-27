@@ -12,6 +12,7 @@
     <string name="google_signin_intent_failed">Google signin intent failed! Check your connection.</string>
     <string name="google_signin_cancelled">Google signin cancelled!</string>
     <string name="google_signin_failed">Google signin failed!</string>
+    <string name="google_signin_unknown_error">Google signin error!</string>
     <string name="firebase_signin_failed">Firebase signin failed! Check your connection.</string>
     <string name="firebase_user_notfound">Firebase user not found.</string>
 

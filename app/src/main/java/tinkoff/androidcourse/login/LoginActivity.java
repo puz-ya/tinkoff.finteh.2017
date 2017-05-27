@@ -59,39 +59,16 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
         Log.i("LoginActivity", "onCreate " + toString());
         setContentView(R.layout.activity_login);
 
-        //we skip Login check if we already logged
-        //TODO: needed more secure check
-        if(PrefManager.getInstance().loggedIn() && !PrefManager.getInstance().login().isEmpty()){
-            redirectToNavigation();
-        }else{
-
-            login = (EditText) findViewById(R.id.edit_text_login);
-            password = (EditText) findViewById(R.id.edit_text_password);
-
-            login.setText(PrefManager.getInstance().login());
-
-            button = (ProgressButton) findViewById(R.id.btn_enter);
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showProgress();
-                    //new LoginTask(loginFragment).execute(new String[]{login.getText().toString(),password.getText().toString()});
-                    presenter.onLoginButtonClick(login.getText().toString(), password.getText().toString());
-                }
-            });
-            //*/
-        }
-
         // google auth part
         signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                .requestIdToken(getString(R.string.default_web_client_id))
-                                .requestEmail()
-                                .build();
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
 
         client = new GoogleApiClient.Builder(this)
-                                .enableAutoManage(this, this)
-                                .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
-                                .build();
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
+                .build();
 
         signInButton = (SignInButton) findViewById(R.id.google_signIN_button);
         signInButton.setOnClickListener(new View.OnClickListener() {
@@ -102,6 +79,30 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
             }
 
         });
+
+        //we skip Login check if we already logged
+        //TODO: needed more secure check
+        button = (ProgressButton) findViewById(R.id.btn_enter);
+        if(PrefManager.getInstance().loggedIn() && !PrefManager.getInstance().login().isEmpty()){
+            //too fast to show something
+            googleSignIn();
+        }else{
+
+            login = (EditText) findViewById(R.id.edit_text_login);
+            login.setText(PrefManager.getInstance().login());
+
+            password = (EditText) findViewById(R.id.edit_text_password);
+
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showProgress();
+                    //new LoginTask(loginFragment).execute(new String[]{login.getText().toString(),password.getText().toString()});
+                    presenter.onLoginButtonClick(login.getText().toString(), password.getText().toString());
+                }
+            });
+            //*/
+        }
 
     }
 
@@ -159,6 +160,8 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == G00GLE_SIGN_IN) {
             if (resultCode == RESULT_OK) {
+                //show progress again
+                showProgress();
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
                 handleSignInResult(result);
             } else {
@@ -184,6 +187,9 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
                 case SIGN_IN_FAILED:
                     showFailedAuth(getString(R.string.google_signin_failed));
                     break;
+                default:
+                    showFailedAuth(getString(R.string.google_signin_unknown_error));
+                    break;
             }
         }
 
@@ -204,6 +210,7 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
 
                     if (user != null) {
                         PrefManager.getInstance().saveLogin(user.getDisplayName());
+                        hideProgress();
                         redirectToNavigation();
                     } else {
                         showFailedAuth(getString(R.string.firebase_user_notfound));
@@ -221,6 +228,7 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
     * google sign in - intent
     * */
     private void googleSignIn() {
+        hideProgress();
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(client);
         startActivityForResult(signInIntent, G00GLE_SIGN_IN);
     }

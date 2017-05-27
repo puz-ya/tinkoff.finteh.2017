@@ -5,11 +5,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import tinkoff.androidcourse.R;
+import tinkoff.androidcourse.ui.KeyboardHide;
 
 /**
  * Created on 28.04.2017

@@ -194,6 +194,23 @@ public class NavigationActivity extends AppCompatActivity
         fragmentTransaction.commit();
     }
 
+    /** replace fragment to Chat */
+    public void startChatScreen(String pos){
+
+        Bundle bundle = new Bundle();
+        bundle.putString(ChatFragment.ARG_DIALOG_ID, pos);
+
+        ChatFragment chatFragment = new ChatFragment();
+        chatFragment.setArguments(bundle);
+
+        //addToBackStack to correctly return to Dialogs
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
+        fragmentTransaction = fragmentTransaction.replace(R.id.content_navigation, chatFragment, "chatFragmentTag");
+        fragmentTransaction.addToBackStack("showChat");
+        fragmentTransaction.commit();
+    }
+
     /** Activity DialogAdd will send the result back to Fragment through NavigationActivity */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

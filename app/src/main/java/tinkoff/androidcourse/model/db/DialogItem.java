@@ -37,6 +37,7 @@ public class DialogItem {
 
         DateFormat df = new SimpleDateFormat("yyyy.MM.dd | HH:mm:ss", Locale.getDefault());
         this.creation_time = df.format(Calendar.getInstance().getTime());
+        this.lastMessage = "";
     }
 
     //may be we need specify special TIME
@@ -44,6 +45,7 @@ public class DialogItem {
         this.title = title;
         this.desc = desc;
         this.creation_time = creation_time;
+        this.lastMessage = "";
     }
 
     public String getTitle() {

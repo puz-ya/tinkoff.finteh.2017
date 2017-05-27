@@ -13,37 +13,37 @@ import com.google.firebase.database.Transaction;
 
 import java.util.ArrayList;
 
-import tinkoff.androidcourse.model.db.DialogItem;
+import tinkoff.androidcourse.model.db.MessageItem;
 
 /**
- * Created on 25.05.2017
+ * Created on 27.05.2017
  *
  * @author Puzino Yury
  */
 
-public class DialogRepository {
+public class MessagesRepository {
 
-    private final static DialogRepository instance = new DialogRepository();
+    private final static MessagesRepository instance = new MessagesRepository();
     private final DatabaseReference db;
-    private final static String FB_DIALOG = "dialogs";   //branch for dialogs in firebase DB
+    private final static String FB_MESSAGE = "messages";   //branch for messages in firebase DB
 
-    public DialogRepository() {
-        this.db = FirebaseDatabase.getInstance().getReference(FB_DIALOG);
+    public MessagesRepository() {
+        this.db = FirebaseDatabase.getInstance().getReference(FB_MESSAGE);
     }
 
-    public static synchronized DialogRepository getInstance() {
+    public static synchronized MessagesRepository getInstance() {
         return instance;
     }
 
-    public void addDialog(final DialogItem dialogItem, final OnTransactionComplete<Void> onTransactionComplete) {
+    public void addMessage(final MessageItem messageItem, final OnTransactionComplete<Void> onTransactionComplete) {
 
-        UserInfo userInfo = FirebaseAuth.getInstance().getCurrentUser();
+        //UserInfo userInfo = FirebaseAuth.getInstance().getCurrentUser();
 
         db.push().runTransaction(new Transaction.Handler() {
 
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
-                mutableData.setValue(dialogItem);
+                mutableData.setValue(messageItem);
                 return Transaction.success(mutableData);
             }
             @Override
@@ -61,17 +61,17 @@ public class DialogRepository {
     }
 
     /**
-     * todo: retrieve dialogs with this method in the future
+     * todo: retrieve messages with this method in the future
      * */
-    public void getDialogs(final DialogItemValueListener eventListener) {
+    public void getMessages(final MessageItemValueListener eventListener) {
 
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        //FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         db.addChildEventListener(new ChildEventListener() {
 
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                DialogItem value = dataSnapshot.getValue(DialogItem.class);
+                MessageItem value = dataSnapshot.getValue(MessageItem.class);
             }
 
             @Override
@@ -101,9 +101,9 @@ public class DialogRepository {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                ArrayList<DialogItem> items = new ArrayList<>();
+                ArrayList<MessageItem> items = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        items.add(snapshot.getValue(DialogItem.class));
+                        items.add(snapshot.getValue(MessageItem.class));
                     }
 
                 eventListener.onValue(items);

@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
@@ -55,7 +56,7 @@ public class DialogFragment extends Fragment
     private static final int REQUEST_CODE_ADD_DIALOG = 55;
 
     private static final int DELAY_INSERT_UPDATE = 1000;
-    private static final int DELAY_GET_FROM_SOURCE = 3000;
+    private static final int DELAY_GET_FROM_SOURCE = 2000;
 
     private DialogRepository dialogRepository = DialogRepository.getInstance();
 
@@ -126,8 +127,9 @@ public class DialogFragment extends Fragment
 
         //set Firebase adapter
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("dialogs");
+        Query query = ref.orderByChild("id");
         adapterFB = new FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder>(
-                DialogItem.class, R.layout.item_chat_dialog, DialogAdapter.ViewHolder.class, ref
+                DialogItem.class, R.layout.item_chat_dialog, DialogAdapter.ViewHolder.class, query
         ){
             @Override
             public void populateViewHolder(DialogAdapter.ViewHolder viewHolder, DialogItem model, final int FBpos) {
@@ -144,7 +146,8 @@ public class DialogFragment extends Fragment
                                 getString(R.string.dialog_fb_toast_id) + chatId,
                                 Toast.LENGTH_SHORT).show();
 
-                        mCallback.startChatScreen(chatId);
+                        //send
+                        mCallback.startChatScreen(String.valueOf(chatId));
                     }
                 });
             }
@@ -207,6 +210,7 @@ public class DialogFragment extends Fragment
                         Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
                     };
                 };
+
                 dialogRepository.addDialog(dialogItem, onTransactionComplete);
 
             }
@@ -227,6 +231,7 @@ public class DialogFragment extends Fragment
                         }catch (InterruptedException ex){
                             ex.printStackTrace();
                         }
+                        //deliverResult from Loader: Sends the result of the load to the registered listener.
                         deliverResult(getPreviousDialogItems());
                     }
                 }).start();
@@ -260,8 +265,6 @@ public class DialogFragment extends Fragment
                 .queryList();
         //itemList is redundant, but useful while debugging
 
-        //TODO: here we will get List from Firebase
-
         return itemList;
     }
 
@@ -281,6 +284,7 @@ public class DialogFragment extends Fragment
 
     public interface OnLoadChat{
         void startChatScreen(long position);
+        void startChatScreen(String position);
     }
 
     /** ProgressDialog - show & hide */

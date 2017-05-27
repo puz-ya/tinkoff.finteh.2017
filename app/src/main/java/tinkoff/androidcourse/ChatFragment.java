@@ -15,14 +15,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.List;
 import java.util.Locale;
 
+import tinkoff.androidcourse.firebase.DialogRepository;
+import tinkoff.androidcourse.firebase.MessagesRepository;
+import tinkoff.androidcourse.firebase.OnTransactionComplete;
+import tinkoff.androidcourse.model.db.DialogItem;
 import tinkoff.androidcourse.model.db.MessageItem;
 import tinkoff.androidcourse.model.db.MessageItem_Table;
+import tinkoff.androidcourse.ui.KeyboardHide;
 import tinkoff.androidcourse.ui.widgets.SendMessageCompoundView;
 
 /** Show list of messages in selected chat group */
@@ -31,15 +45,21 @@ public class ChatFragment extends Fragment
 
     private RecyclerView recyclerView;
     private ChatAdapter adapter;
+    public FirebaseRecyclerAdapter<MessageItem, ChatAdapter.ViewChatHolder> adapterFireBchat;
 
     private SendMessageCompoundView sView;
     ProgressDialog progress;
     private View mView;
 
+    private MessagesRepository messagesRepository = MessagesRepository.getInstance();
+
     public final static String ARG_DIALOG_ID = "DialogID";
-    private long chatId = -1L;
+    private String chatId = "-1";
     private static final int DELAY_INSERT_UPDATE = 2000;
-    private static final int DELAY_GET_FROM_SOURCE = 7000;
+    private static final int DELAY_GET_FROM_SOURCE = 2000;
+
+    private static final int USER_MESSAGE = 666;
+    private static final int OTHERS_MESSAGE = 999;
 
     public ChatFragment(){}
 
@@ -51,7 +71,6 @@ public class ChatFragment extends Fragment
     public static ChatFragment newInstance(String title) {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
-        //args.putString(ARG_POSITION, title);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,7 +80,7 @@ public class ChatFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
         if (getArguments() != null) {
-            chatId = getArguments().getLong(ARG_DIALOG_ID);
+            chatId = getArguments().getString(ARG_DIALOG_ID);
         }
 
         initSendMessageView(view);
@@ -75,7 +94,7 @@ public class ChatFragment extends Fragment
 
         if (getActivity().findViewById(R.id.toolbar) != null){
             Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-            toolbar.setTitle(getString(R.string.chat_fragment_set_title) + String.format(Locale.getDefault(), "%d", chatId));
+            toolbar.setTitle(getString(R.string.chat_fragment_set_title) + String.format(Locale.getDefault(), "%s", chatId));
         }
 
         showProgressLoader();
@@ -89,18 +108,28 @@ public class ChatFragment extends Fragment
             public void onClick(View v) {
                 //set click action
                 String message = sView.getMessage();
-                addMessageItemToChat(message);
                 sView.setSendState();
+                KeyboardHide.hideSoftKeyboard(getActivity());
+
+                addMessageItemToChat(message);
             }
         });
     }
 
-    /** //TODO: we didn't implement user_id feature (no DB_table, only loginName...) -> set default 1
+    /** set proper message, user ID, chat ID for this message
+     * @param message - text from user input
      * */
     private void addMessageItemToChat(String message){
+
+        UserInfo userInfo = FirebaseAuth.getInstance().getCurrentUser();
+        String uID = "-1";
+        if(userInfo != null){
+            uID = userInfo.getUid();
+        }
+
         MessageItem messageItem = new MessageItem(
                 message,
-                1,
+                uID,
                 chatId);
 
         updateMessages(messageItem);
@@ -110,8 +139,9 @@ public class ChatFragment extends Fragment
         recyclerView = (RecyclerView) mView.findViewById(R.id.recycler_view_chat);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+
         //setting chat from bottom
-        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new ChatAdapter(dataSet, new OnItemClickListener() {
@@ -122,7 +152,74 @@ public class ChatFragment extends Fragment
                         Toast.LENGTH_SHORT).show();
             }
         });
-        recyclerView.setAdapter(adapter);
+
+        //set Firebase adapter
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("messages");
+        Query query = ref.orderByChild("id_dialog").limitToLast(20).equalTo(chatId);
+
+        adapterFireBchat = new FirebaseRecyclerAdapter<MessageItem, ChatAdapter.ViewChatHolder>(
+                MessageItem.class, R.layout.item_chat_dialog, ChatAdapter.ViewChatHolder.class, query
+        ){
+            @Override
+            public ChatAdapter.ViewChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+                View view = null;
+                LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
+                //set layout depends on TYPE
+                switch(viewType){
+                    case USER_MESSAGE:
+                        view = inflater.inflate(R.layout.item_chat_messages_right, parent, false);
+                        break;
+                    case OTHERS_MESSAGE:
+                        view = inflater.inflate(R.layout.item_chat_messages_left, parent, false);
+                        break;
+                    default:
+                        view = inflater.inflate(R.layout.item_chat_messages_left, parent, false);
+                        break;
+                }
+
+                return new ChatAdapter.ViewChatHolder(view);
+            }
+
+            @Override
+            public int getItemViewType(int position) {
+                // Simply returning an integer to use in onCreateViewHolder.
+                UserInfo userInfo = FirebaseAuth.getInstance().getCurrentUser();
+                MessageItem messageItem = getItem(position);
+                if (userInfo != null){
+                    if (messageItem.getId_author().equals(userInfo.getUid())){
+                        return USER_MESSAGE;
+                    }else{
+                        return OTHERS_MESSAGE;
+                    }
+                }
+                //todo: need to set error code
+                return OTHERS_MESSAGE;
+            }
+
+            @Override
+            public void populateViewHolder(ChatAdapter.ViewChatHolder viewHolder, MessageItem model, final int FBpos) {
+                viewHolder.setText(model.getText());
+                viewHolder.setTime(model.getCreation_time());
+                viewHolder.setUserId(model.getId_author());
+
+                viewHolder.getmView().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        //get dialog's ID from FB adapter and give it to Chat
+                        long chatId = adapterFireBchat.getItem(FBpos).getId();
+                        Toast.makeText(getActivity(),
+                                getString(R.string.chat_toast_id) + chatId,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+        };
+
+        recyclerView.setAdapter(adapterFireBchat);
     }
 
     @NonNull
@@ -132,7 +229,7 @@ public class ChatFragment extends Fragment
                 .where(MessageItem_Table.id_dialog.is(chatId))
                 .orderBy(MessageItem_Table.creation_time, false)
                 .queryList();
-
+        //yes, it's redundant, but useful for debug
         return itemList;
     }
 
@@ -143,8 +240,25 @@ public class ChatFragment extends Fragment
             public void run(){
                 FlowManager.getModelAdapter(MessageItem.class).save(message);
                 adapter.addMessage(message);
-                recyclerView.smoothScrollToPosition(0);
                 adapter.notifyDataSetChanged();
+
+                //add to FB
+                final OnTransactionComplete<Void> onTransactionComplete = new OnTransactionComplete<Void>() {
+
+                    @Override
+                    public void onCommit(Void v) {
+                        //finish();
+                    }
+
+                    @Override
+                    public void onAbort(Exception e) {
+                        Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
+                    };
+                };
+                messagesRepository.addMessage(message, onTransactionComplete);
+
+                recyclerView.smoothScrollToPosition(adapterFireBchat.getItemCount());
+
             }
         }, DELAY_INSERT_UPDATE);
     }

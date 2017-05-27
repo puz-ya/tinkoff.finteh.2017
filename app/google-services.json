@@ -1,0 +1,130 @@
+{
+  "project_info": {
+    "project_number": "669753197696",
+    "firebase_url": "https://tinkoffchat17.firebaseio.com",
+    "project_id": "tinkoffchat17",
+    "storage_bucket": "tinkoffchat17.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669753197696:android:2afc09355f08cbb0",
+        "android_client_info": {
+          "package_name": "tinkoff.androidcourse"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "669753197696-sgfgok2eafgsa62lssaa7261l1vsk4qc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOKRZcxUpXE79AaqnsThBHl4Veki1Q8ow"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669753197696:android:554d08fc1cb38385",
+        "android_client_info": {
+          "package_name": "tinkoff.androidcourse.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "669753197696-pn49jvhaiit3fhmea53nu09106fk8pgp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tinkoff.androidcourse.debug",
+            "certificate_hash": "78affdc5a0760acad9a5a8de72b389c72396c6b3"
+          }
+        },
+        {
+          "client_id": "669753197696-sgfgok2eafgsa62lssaa7261l1vsk4qc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOKRZcxUpXE79AaqnsThBHl4Veki1Q8ow"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "669753197696-sgfgok2eafgsa62lssaa7261l1vsk4qc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669753197696:android:9b221f7e2501a61e",
+        "android_client_info": {
+          "package_name": "tinkoff.androidcourse.prodDebug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "669753197696-akoi47ndu3thgufi7ee0qta02k1kogb3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tinkoff.androidcourse.prodDebug",
+            "certificate_hash": "78affdc5a0760acad9a5a8de72b389c72396c6b3"
+          }
+        },
+        {
+          "client_id": "669753197696-sgfgok2eafgsa62lssaa7261l1vsk4qc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOKRZcxUpXE79AaqnsThBHl4Veki1Q8ow"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "669753197696-sgfgok2eafgsa62lssaa7261l1vsk4qc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
