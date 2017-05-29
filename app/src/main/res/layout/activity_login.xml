@@ -10,6 +10,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="tinkoff.androidcourse.login.LoginActivity">
 
+    <!--
+    TODO: to set email & password auth we must send their sign-in credentials
+    (for example, their username and password) to your authentication server.
+    Your server checks the credentials and returns a custom token if they are valid.
+    https://firebase.google.com/docs/auth/android/custom-auth
+
     <EditText
         android:id="@+id/edit_text_login"
         android:layout_width="match_parent"
@@ -35,6 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp" />
+    -->
 
     <com.google.android.gms.common.SignInButton
             android:id="@+id/google_signIN_button"

@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -127,7 +129,7 @@ public class DialogFragment extends Fragment
 
         //set Firebase adapter
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("dialogs");
-        Query query = ref.orderByChild("id");
+        Query query = ref.orderByChild("creation_time");
         adapterFB = new FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder>(
                 DialogItem.class, R.layout.item_chat_dialog, DialogAdapter.ViewHolder.class, query
         ){
@@ -177,9 +179,16 @@ public class DialogFragment extends Fragment
                 // Check extra
                 if(data.hasExtra(EXTRA_DIALOG_TITLE) && data.hasExtra(EXTRA_DIALOG_DESCR)) {
 
+                    UserInfo userInfo = FirebaseAuth.getInstance().getCurrentUser();
+                    String uID = "-1";
+                    if(userInfo != null){
+                        uID = userInfo.getUid();
+                    }
+
                     DialogItem dialogItem = new DialogItem(
                             data.getStringExtra(EXTRA_DIALOG_TITLE),
-                            data.getStringExtra(EXTRA_DIALOG_DESCR));
+                            data.getStringExtra(EXTRA_DIALOG_DESCR),
+                            uID);
                     updateDialogs(dialogItem);
                 }
             }
@@ -193,7 +202,8 @@ public class DialogFragment extends Fragment
             public void run(){
 
                 //add to DB
-                FlowManager.getModelAdapter(DialogItem.class).save(dialogItem);
+                //todo: either clean install either update DB version with migration (v3)
+                //FlowManager.getModelAdapter(DialogItem.class).save(dialogItem);
                 adapter.addDialog(dialogItem);
                 adapter.notifyDataSetChanged();
 

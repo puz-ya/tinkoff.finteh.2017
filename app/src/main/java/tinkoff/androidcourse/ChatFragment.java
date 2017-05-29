@@ -238,7 +238,9 @@ public class ChatFragment extends Fragment
         handler.postDelayed(new Runnable(){
             @Override
             public void run(){
-                FlowManager.getModelAdapter(MessageItem.class).save(message);
+
+                //todo: either clean install either update DB version with migration (v3)
+                //FlowManager.getModelAdapter(MessageItem.class).save(message);
                 adapter.addMessage(message);
                 adapter.notifyDataSetChanged();
 

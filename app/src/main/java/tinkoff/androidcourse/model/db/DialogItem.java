@@ -13,6 +13,7 @@ import java.util.Locale;
 public class DialogItem {
 
     @PrimaryKey(autoincrement = true)
+            //todo: somehow useless with firebase
     long id;
 
     @Column
@@ -24,6 +25,10 @@ public class DialogItem {
     @Column
     String creation_time;   //yes, DBFlow accept Date format, but...
 
+    @Column
+    String id_author;   //just set author id for this time
+    //todo: need to set up "attended users list" in dialogs for each dialog
+
     /** version 2 */
     @Column
     String lastMessage;
@@ -31,6 +36,7 @@ public class DialogItem {
     public DialogItem() {
     }
 
+    /* deprecated since need user id
     public DialogItem(String title, String desc) {
         this.title = title;
         this.desc = desc;
@@ -39,11 +45,23 @@ public class DialogItem {
         this.creation_time = df.format(Calendar.getInstance().getTime());
         this.lastMessage = "";
     }
+    */
 
-    //may be we need specify special TIME
-    public DialogItem(String title, String desc, String creation_time) {
+    public DialogItem(String title, String desc, String id_author) {
         this.title = title;
         this.desc = desc;
+        this.id_author = id_author;
+
+        DateFormat df = new SimpleDateFormat("yyyy.MM.dd | HH:mm:ss", Locale.getDefault());
+        this.creation_time = df.format(Calendar.getInstance().getTime());
+        this.lastMessage = "";
+    }
+
+    //may be we need specify special TIME
+    public DialogItem(String title, String desc, String id_author, String creation_time) {
+        this.title = title;
+        this.desc = desc;
+        this.id_author = id_author;
         this.creation_time = creation_time;
         this.lastMessage = "";
     }
@@ -87,5 +105,13 @@ public class DialogItem {
 
     public void setLastMessage(String lastMessage) {
         this.lastMessage = lastMessage;
+    }
+
+    public String getId_author() {
+        return id_author;
+    }
+
+    public void setId_author(String id_author) {
+        this.id_author = id_author;
     }
 }

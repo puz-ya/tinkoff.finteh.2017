@@ -16,25 +16,33 @@ import tinkoff.androidcourse.login.LoginView;
 public class DialogAddPresenter extends MvpBasePresenter<DialogAddView> {
 
     //for future version - check error and set view accordingly
-    private Integer ERROR_NO_NAME = 1;
-    private Integer ERROR_NO_DESCR = 2;
-    private Integer ERROR_TOO_SHORT_NAME = 3;
-    private Integer ERROR_TOO_SHORT_DESCR = 4;
+    @VisibleForTesting
+    Integer ERROR_NO_NAME = 1;
+    @VisibleForTesting
+    Integer ERROR_NO_DESCR = 2;
+    @VisibleForTesting
+    Integer ERROR_TOO_SHORT_NAME = 3;
+    @VisibleForTesting
+    Integer ERROR_TOO_SHORT_DESCR = 4;
 
-    private Boolean result;
-    private Integer error_code;
+    @VisibleForTesting
+    Boolean result;
+    @VisibleForTesting
+    Integer error_code;
 
-    private String title;
-    private String descr;
+    @VisibleForTesting
+    String title;
+    @VisibleForTesting
+    String descr;
 
     /* if we restore view state
     * */
     @Override
     public void attachView(DialogAddView addView){
         super.attachView(addView);
-        if(result != null){
-            onDecision(result);
-            result = null;
+        if(this.result != null){
+            onDecision(this.result);
+            this.result = null;
         }
     }
 
@@ -56,18 +64,25 @@ public class DialogAddPresenter extends MvpBasePresenter<DialogAddView> {
         if (title.isEmpty()) {
             result = false;
             error_code = ERROR_NO_NAME;
-        }
-        if (title.length() < 3){
+            setAuthResult(result);
+            return;
+        }else if (title.length() < 3){
             result = false;
             error_code = ERROR_TOO_SHORT_NAME;
+            setAuthResult(result);
+            return;
         }
+
         if(descr.isEmpty()){
             result = false;
             error_code = ERROR_NO_DESCR;
-        }
-        if (descr.length() < 3){
+            setAuthResult(result);
+            return;
+        }else if (descr.length() < 3){
             result = false;
             error_code = ERROR_TOO_SHORT_DESCR;
+            setAuthResult(result);
+            return;
         }
 
         this.title = title;

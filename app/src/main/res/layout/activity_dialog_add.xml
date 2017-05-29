@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="tinkoff.androidcourse.dialogsAdd.DialogAddActivity">
 
     <tinkoff.androidcourse.ui.widgets.DialogAddCompoundView
@@ -12,5 +13,13 @@
         android:orientation="vertical">
 
     </tinkoff.androidcourse.ui.widgets.DialogAddCompoundView>
+
+    <TextView
+        android:id="@+id/dialog_add_tv_error"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        />
 
 </LinearLayout>

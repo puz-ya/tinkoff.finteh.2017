@@ -6,11 +6,13 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 
 import tinkoff.androidcourse.DialogFragment;
 import tinkoff.androidcourse.R;
+import tinkoff.androidcourse.ui.KeyboardHide;
 import tinkoff.androidcourse.ui.widgets.DialogAddCompoundView;
 
 /**
@@ -24,6 +26,8 @@ public class DialogAddActivity extends MvpActivity<DialogAddView, DialogAddPrese
 
     //simple compound of edittexts & button as one
     private DialogAddCompoundView compoundView;
+    //show error text
+    private TextView textViewError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,7 @@ public class DialogAddActivity extends MvpActivity<DialogAddView, DialogAddPrese
             }
         });
 
+        textViewError = (TextView) findViewById(R.id.dialog_add_tv_error);
     }
 
     @NonNull
@@ -60,12 +65,16 @@ public class DialogAddActivity extends MvpActivity<DialogAddView, DialogAddPrese
     }
 
     /* if input text (Name & Descr) NOT OK -> show red error
+    * todo: add errors codes check
     * */
     @Override
     public void showFailedPopup(int code){
         if(compoundView != null) {
             compoundView.clearTexts();
             compoundView.setRedEdits(code);
+            KeyboardHide.hideSoftKeyboard(this);
+
+            textViewError.setText(getString(R.string.dialog_add_tv_error_text));
         }
     }
 }

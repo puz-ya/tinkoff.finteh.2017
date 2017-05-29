@@ -82,12 +82,20 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
 
         //we skip Login check if we already logged
         //TODO: needed more secure check
-        button = (ProgressButton) findViewById(R.id.btn_enter);
+        //button = (ProgressButton) findViewById(R.id.btn_enter);
         if(PrefManager.getInstance().loggedIn() && !PrefManager.getInstance().login().isEmpty()){
             //too fast to show something
             googleSignIn();
         }else{
 
+            /*
+            TODO: to set email & password auth we must send their sign-in credentials
+                    (for example, their username and password) to your authentication server.
+            Your server checks the credentials and returns a custom token if they are valid.
+                    https://firebase.google.com/docs/auth/android/custom-auth
+            */
+
+            /*
             login = (EditText) findViewById(R.id.edit_text_login);
             login.setText(PrefManager.getInstance().login());
 
@@ -122,7 +130,7 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
 
     @Override
     public void showFailedAuth() {
-        hideProgress();
+        //hideProgress();
 
         DialogFragment newFragment = MyDialogFragment.newInstance(
                 getString(R.string.login_problem)
@@ -132,7 +140,7 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
 
     @Override
     public void showFailedAuth(String failText) {
-        hideProgress();
+        //hideProgress();
 
         DialogFragment newFragment = MyDialogFragment.newInstance(
                 failText
@@ -160,8 +168,8 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == G00GLE_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                //show progress again
-                showProgress();
+                //show progress again (after auth with email will be done (?))
+                //showProgress();
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
                 handleSignInResult(result);
             } else {
@@ -210,7 +218,7 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
 
                     if (user != null) {
                         PrefManager.getInstance().saveLogin(user.getDisplayName());
-                        hideProgress();
+                        //hideProgress();
                         redirectToNavigation();
                     } else {
                         showFailedAuth(getString(R.string.firebase_user_notfound));
@@ -228,7 +236,7 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
     * google sign in - intent
     * */
     private void googleSignIn() {
-        hideProgress();
+        //hideProgress();
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(client);
         startActivityForResult(signInIntent, G00GLE_SIGN_IN);
     }
