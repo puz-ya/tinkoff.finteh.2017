@@ -1,5 +1,7 @@
 package tinkoff.androidcourse.login;
 
+import android.app.Activity;
+
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 /**
@@ -15,4 +17,7 @@ public interface LoginView extends MvpView{
     // if FAIL -> show error dialog (toast \ snack \ alert)
     void showFailedAuth();  //default text
     void showFailedAuth(String text);
+    void showFailedAuth(int r_id);
+
+    Activity getLoginActivity();
 }

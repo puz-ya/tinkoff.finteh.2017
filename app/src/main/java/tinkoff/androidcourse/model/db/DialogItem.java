@@ -58,12 +58,12 @@ public class DialogItem {
     }
 
     //may be we need specify special TIME
-    public DialogItem(String title, String desc, String id_author, String creation_time) {
+    public DialogItem(String title, String desc, String id_author, String creation_time, String lastMessage) {
         this.title = title;
         this.desc = desc;
         this.id_author = id_author;
         this.creation_time = creation_time;
-        this.lastMessage = "";
+        this.lastMessage = lastMessage;
     }
 
     public String getTitle() {

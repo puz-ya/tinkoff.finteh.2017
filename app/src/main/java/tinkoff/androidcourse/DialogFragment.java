@@ -40,7 +40,7 @@ import static tinkoff.androidcourse.App.ARG_TITLE;
 
 /** Show list of chat groups */
 public class DialogFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<List<DialogItem>>{
+        implements LoaderManager.LoaderCallbacks<Query>{
 
     private RecyclerView recyclerView;
     private DialogAdapter adapter;
@@ -61,6 +61,7 @@ public class DialogFragment extends Fragment
     private static final int DELAY_GET_FROM_SOURCE = 2000;
 
     private DialogRepository dialogRepository = DialogRepository.getInstance();
+    private Query query;
 
     public DialogFragment(){}
 
@@ -126,10 +127,16 @@ public class DialogFragment extends Fragment
                 mCallback.startChatScreen(chatId);
             }
         });
+    }
+
+    private void initRecyclerViewFirebase(Query query) {
+        recyclerView = (RecyclerView) mView.findViewById(R.id.recycler_view_dialogs);
+        recyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
 
         //set Firebase adapter
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("dialogs");
-        Query query = ref.orderByChild("creation_time");
         adapterFB = new FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder>(
                 DialogItem.class, R.layout.item_chat_dialog, DialogAdapter.ViewHolder.class, query
         ){
@@ -227,6 +234,7 @@ public class DialogFragment extends Fragment
         }, DELAY_INSERT_UPDATE);
     }
 
+    /*
     @Override
     public Loader<List<DialogItem>> onCreateLoader(int id, Bundle args) {
 
@@ -243,6 +251,38 @@ public class DialogFragment extends Fragment
                         }
                         //deliverResult from Loader: Sends the result of the load to the registered listener.
                         deliverResult(getPreviousDialogItems());
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("dialogs");
+                        Query query = ref.orderByChild("creation_time");
+                    }
+                }).start();
+            }
+
+            @Override
+            protected void onStopLoading() {}
+        };
+
+        return mLoader;
+    }
+    */
+
+    @Override
+    public Loader<Query> onCreateLoader(int id, Bundle args) {
+
+        Loader<Query> mLoader = new Loader<Query>(getActivity()){
+            @Override
+            protected void onStartLoading() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(DELAY_GET_FROM_SOURCE);
+                        }catch (InterruptedException ex){
+                            ex.printStackTrace();
+                        }
+                        //deliverResult from Loader: Sends the result of the load to the registered listener.
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("dialogs");
+                        Query query = ref.orderByChild("creation_time");
+                        deliverResult(query);
                     }
                 }).start();
             }
@@ -254,6 +294,7 @@ public class DialogFragment extends Fragment
         return mLoader;
     }
 
+    /*
     @Override
     public void onLoadFinished(Loader<List<DialogItem>> loader, final List<DialogItem> data) {
         getActivity().runOnUiThread(new Runnable() {
@@ -264,9 +305,26 @@ public class DialogFragment extends Fragment
             }
         });
     }
+    */
 
+    /*
     @Override
     public void onLoaderReset(Loader<List<DialogItem>> loader) {}
+    */
+
+    @Override
+    public void onLoadFinished(Loader<Query> loader, final Query data) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //initRecyclerView(data);
+                initRecyclerViewFirebase(data);
+                hideProgressLoader();
+            }
+        });
+    }
+    @Override
+    public void onLoaderReset(Loader<Query> loader) {}
 
     @NonNull
     private List<DialogItem> getPreviousDialogItems() {
@@ -310,4 +368,9 @@ public class DialogFragment extends Fragment
         progress4Dialogs.dismiss();
     }
 
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        adapterFB.cleanup();
+    }
 }

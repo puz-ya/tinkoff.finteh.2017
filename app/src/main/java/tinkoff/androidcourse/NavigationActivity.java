@@ -17,6 +17,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 import tinkoff.androidcourse.login.LoginActivity;
@@ -169,12 +172,16 @@ public class NavigationActivity extends AppCompatActivity
     /** erase previous logged bool value (we need login value for re-enter) */
     private void logOut(){
 
-        PrefManager.getInstance().saveLoggedIn(false);
-        FirebaseAuth.getInstance().signOut();
-
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-        finish();
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // user is now signed out
+                        PrefManager.getInstance().saveLoggedIn(false);
+                        startActivity(new Intent(NavigationActivity.this, LoginActivity.class));
+                        finish();
+                    }
+                });
     }
 
     /** replace fragment to Chat */
