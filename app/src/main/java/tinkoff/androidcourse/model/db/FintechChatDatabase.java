@@ -67,6 +67,7 @@ public final class FintechChatDatabase {
             cursor_messages.close();
 
             //bad practice, but nothing better :(
+            /*
             for(int i=0; i < lastMess.size(); i++){
 
                 SQLite.update(DialogItem.class)
@@ -75,6 +76,7 @@ public final class FintechChatDatabase {
                         .execute(database); // required inside a migration to pass the wrapper
 
             }
+            */
 
         }
     }

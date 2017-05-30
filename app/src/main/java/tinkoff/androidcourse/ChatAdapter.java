@@ -97,7 +97,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewChatHolder
 
     @Override
     public long getItemId(int position) {
-        return dataset.get(position).getId();
+        //todo: delete or refactor
+        return Integer.valueOf(dataset.get(position).getId_author());
     }
 
     public static class ViewChatHolder extends RecyclerView.ViewHolder {

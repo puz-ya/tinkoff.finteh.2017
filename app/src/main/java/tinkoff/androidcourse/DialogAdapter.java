@@ -50,7 +50,8 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.ViewHolder
 
     @Override
     public long getItemId(int position) {
-        return dataset.get(position).getId();
+        // todo: delete or refactor
+        return Integer.valueOf(dataset.get(position).getAuthor_id());
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

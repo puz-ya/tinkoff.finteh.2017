@@ -20,30 +20,42 @@ import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import tinkoff.androidcourse.dialogsAdd.DialogAddActivity;
+import tinkoff.androidcourse.firebase.DialogItemValueListener;
 import tinkoff.androidcourse.firebase.DialogRepository;
 import tinkoff.androidcourse.firebase.OnTransactionComplete;
 import tinkoff.androidcourse.model.db.DialogItem;
+import tinkoff.androidcourse.model.db.User;
 
 import static android.app.Activity.RESULT_OK;
 import static tinkoff.androidcourse.App.ARG_MENU_ID;
 import static tinkoff.androidcourse.App.ARG_TITLE;
 
 /** Show list of chat groups */
-public class DialogFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Query>{
+public class DialogFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private DialogAdapter adapter;
+    //private DialogAdapter adapter;
     public FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder> adapterFB;
 
     private Button addDialog;
@@ -57,9 +69,10 @@ public class DialogFragment extends Fragment
     public static final String EXTRA_DIALOG_DESCR = "DIALOG_DESCR";
     private static final int REQUEST_CODE_ADD_DIALOG = 55;
 
-    private static final int DELAY_INSERT_UPDATE = 1000;
-    private static final int DELAY_GET_FROM_SOURCE = 2000;
+    private static final int DELAY_INSERT_UPDATE = 2000;
+    private static final int DELAY_GET_FROM_SOURCE = 3000;
 
+    private DatabaseReference mDatabase;
     private DialogRepository dialogRepository = DialogRepository.getInstance();
     private Query query;
 
@@ -93,6 +106,11 @@ public class DialogFragment extends Fragment
 
         this.mView = view;
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        recyclerView = (RecyclerView) mView.findViewById(R.id.recycler_view_dialogs);
+        recyclerView.setHasFixedSize(true);
+
         return view;
     }
 
@@ -103,74 +121,79 @@ public class DialogFragment extends Fragment
 
         //start spinning and get the data
         showProgressLoader();
-        getLoaderManager().initLoader(0, null, this);
-    }
 
-    private void initRecyclerView(List<DialogItem> dataSet) {
-        recyclerView = (RecyclerView) mView.findViewById(R.id.recycler_view_dialogs);
-        recyclerView.setHasFixedSize(true);
-
+        //set layout to recycler
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        //set DB adapter
-        adapter = new DialogAdapter(dataSet, new OnItemClickListener() {
+        initRecyclerViewFirebase();
+
+        //hide progress loader (spinning)
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable(){
             @Override
-            public void onItemClick(int position) {
-
-                //get dialog's ID from DB (adapter) and give it to Chat
-                long chatId = adapter.getItemId(position);
-                Toast.makeText(getActivity(),
-                        getString(R.string.dialog_toast_id) + chatId,
-                        Toast.LENGTH_SHORT).show();
-
-                mCallback.startChatScreen(chatId);
+            public void run() {
+                hideProgressLoader();
             }
-        });
+        }, DELAY_GET_FROM_SOURCE);
     }
 
-    private void initRecyclerViewFirebase(Query query) {
-        recyclerView = (RecyclerView) mView.findViewById(R.id.recycler_view_dialogs);
-        recyclerView.setHasFixedSize(true);
+    /**
+     * get data from firebase & input into adapeter, then into recyclerview
+     */
+    private void initRecyclerViewFirebase() {
+        // Set up FirebaseRecyclerAdapter with the Query
+        Query postsQuery = mDatabase.child("dialogs").limitToFirst(100);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-
-        //set Firebase adapter
         adapterFB = new FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder>(
-                DialogItem.class, R.layout.item_chat_dialog, DialogAdapter.ViewHolder.class, query
+                DialogItem.class, R.layout.item_chat_dialog, DialogAdapter.ViewHolder.class, postsQuery
         ){
             @Override
-            public void populateViewHolder(DialogAdapter.ViewHolder viewHolder, DialogItem model, final int FBpos) {
+            protected void populateViewHolder(final DialogAdapter.ViewHolder viewHolder, final DialogItem model, final int position) {
+                final DatabaseReference postRef = getRef(position);
+
                 viewHolder.setTitle(model.getTitle());
                 viewHolder.setDesc(model.getDesc());
 
-                viewHolder.getmView().setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                //get dialog's ID from DB and give it to Chat
+                final String postKey = postRef.getKey();
 
-                        //get dialog's ID from FB adapter and give it to Chat
-                        long chatId = adapterFB.getItem(FBpos).getId();
+                // Set click listener for the dialog item
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
                         Toast.makeText(getActivity(),
-                                getString(R.string.dialog_fb_toast_id) + chatId,
+                                getString(R.string.dialog_toast_id) + postKey,
                                 Toast.LENGTH_SHORT).show();
 
-                        //send
-                        mCallback.startChatScreen(String.valueOf(chatId));
+                        // Launch ChatFragment with messages
+                        mCallback.startChatScreen(postKey);
                     }
                 });
+
+                /*
+                // Bind Post to ViewHolder, setting OnClickListener for the star button
+                viewHolder.bindToPost(model, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View starView) {
+                        // Need to write to both places the post is stored
+                        DatabaseReference globalPostRef = mDatabase.child("posts").child(postRef.getKey());
+                        DatabaseReference userPostRef = mDatabase.child("user-posts").child(model.uid).child(postRef.getKey());
+
+                        // Run two transactions
+                        onStarClicked(globalPostRef);
+                        onStarClicked(userPostRef);
+                    }
+                });
+                */
             }
-
         };
-
-        //set adapter to RecyclerView
         recyclerView.setAdapter(adapterFB);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), layoutManager.getOrientation());
-        recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
-    /** Start DialogAddActivity with "Compound View" to retrieve Title & Description of the new Dialog
-     * */
+        /** Start DialogAddActivity with "Compound View" to retrieve Title & Description of the new Dialog
+         * */
     private void addDialogItem() {
         Intent intent = new Intent(getActivity(), DialogAddActivity.class);
         startActivityForResult(intent, REQUEST_CODE_ADD_DIALOG);
@@ -179,6 +202,7 @@ public class DialogFragment extends Fragment
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         // Check which request we're responding to
         if (requestCode == REQUEST_CODE_ADD_DIALOG) {
             // Make sure the request was successful
@@ -186,154 +210,60 @@ public class DialogFragment extends Fragment
                 // Check extra
                 if(data.hasExtra(EXTRA_DIALOG_TITLE) && data.hasExtra(EXTRA_DIALOG_DESCR)) {
 
-                    UserInfo userInfo = FirebaseAuth.getInstance().getCurrentUser();
-                    String uID = "-1";
-                    if(userInfo != null){
-                        uID = userInfo.getUid();
-                    }
+                    final String title = data.getStringExtra(EXTRA_DIALOG_TITLE);
+                    final String body = data.getStringExtra(EXTRA_DIALOG_DESCR);
 
-                    DialogItem dialogItem = new DialogItem(
-                            data.getStringExtra(EXTRA_DIALOG_TITLE),
-                            data.getStringExtra(EXTRA_DIALOG_DESCR),
-                            uID);
-                    updateDialogs(dialogItem);
+                    FirebaseUser userInfo = FirebaseAuth.getInstance().getCurrentUser();
+
+                    if(userInfo != null) {
+                        final String userId = userInfo.getUid();
+                        mDatabase.child("users").child(userId).addListenerForSingleValueEvent(
+                                new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        // Get user value
+                                        User user = dataSnapshot.getValue(User.class);
+
+                                        // [START_EXCLUDE]
+                                        if (user == null) {
+                                            // User is null, error out
+
+                                            Toast.makeText(getActivity(),
+                                                    getString(R.string.dialog_add_userinfo_error),
+                                                    Toast.LENGTH_SHORT).show();
+
+                                        } else {
+                                            // Write new post
+                                            writeNewPost(userId, user.name, title, body);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                    }
+                                });
+                    }
                 }
             }
         }
     }
 
-    private void updateDialogs(final DialogItem dialogItem){
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable(){
-            @Override
-            public void run(){
+    private void writeNewPost(String userId, String username, String title, String body) {
+        // Create new dialog at /user-dialogs/$userid/$dialogid and at
+        // /dialogs/$dialogid simultaneously
+        String key = mDatabase.child("dialogs").push().getKey();
 
-                //add to DB
-                //todo: either clean install either update DB version with migration (v3)
-                //FlowManager.getModelAdapter(DialogItem.class).save(dialogItem);
-                adapter.addDialog(dialogItem);
-                adapter.notifyDataSetChanged();
+        DateFormat df = new SimpleDateFormat("yyyy.MM.dd | HH:mm:ss", Locale.getDefault());
+        String creation_time = df.format(Calendar.getInstance().getTime());
 
-                //add to FB
-                final OnTransactionComplete<Void> onTransactionComplete = new OnTransactionComplete<Void>() {
+        DialogItem dialogItem = new DialogItem(userId, username, title, body, creation_time, "");
+        Map<String, Object> dialogValues = dialogItem.toMap();
 
-                    @Override
-                    public void onCommit(Void v) {
-                        //finish();
-                    }
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/dialogs/" + key, dialogValues);
+        childUpdates.put("/user-dialogs/" + userId + "/" + key, dialogValues);
 
-                    @Override
-                    public void onAbort(Exception e) {
-                        Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
-                    };
-                };
-
-                dialogRepository.addDialog(dialogItem, onTransactionComplete);
-
-            }
-        }, DELAY_INSERT_UPDATE);
-    }
-
-    /*
-    @Override
-    public Loader<List<DialogItem>> onCreateLoader(int id, Bundle args) {
-
-        Loader<List<DialogItem>> mLoader = new Loader<List<DialogItem>>(getActivity()){
-            @Override
-            protected void onStartLoading() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(DELAY_GET_FROM_SOURCE);
-                        }catch (InterruptedException ex){
-                            ex.printStackTrace();
-                        }
-                        //deliverResult from Loader: Sends the result of the load to the registered listener.
-                        deliverResult(getPreviousDialogItems());
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("dialogs");
-                        Query query = ref.orderByChild("creation_time");
-                    }
-                }).start();
-            }
-
-            @Override
-            protected void onStopLoading() {}
-        };
-
-        return mLoader;
-    }
-    */
-
-    @Override
-    public Loader<Query> onCreateLoader(int id, Bundle args) {
-
-        Loader<Query> mLoader = new Loader<Query>(getActivity()){
-            @Override
-            protected void onStartLoading() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(DELAY_GET_FROM_SOURCE);
-                        }catch (InterruptedException ex){
-                            ex.printStackTrace();
-                        }
-                        //deliverResult from Loader: Sends the result of the load to the registered listener.
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("dialogs");
-                        Query query = ref.orderByChild("creation_time");
-                        deliverResult(query);
-                    }
-                }).start();
-            }
-
-            @Override
-            protected void onStopLoading() {}
-        };
-
-        return mLoader;
-    }
-
-    /*
-    @Override
-    public void onLoadFinished(Loader<List<DialogItem>> loader, final List<DialogItem> data) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                initRecyclerView(data);
-                hideProgressLoader();
-            }
-        });
-    }
-    */
-
-    /*
-    @Override
-    public void onLoaderReset(Loader<List<DialogItem>> loader) {}
-    */
-
-    @Override
-    public void onLoadFinished(Loader<Query> loader, final Query data) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //initRecyclerView(data);
-                initRecyclerViewFirebase(data);
-                hideProgressLoader();
-            }
-        });
-    }
-    @Override
-    public void onLoaderReset(Loader<Query> loader) {}
-
-    @NonNull
-    private List<DialogItem> getPreviousDialogItems() {
-        List<DialogItem> itemList = SQLite.select()
-                .from(DialogItem.class)
-                .queryList();
-        //itemList is redundant, but useful while debugging
-
-        return itemList;
+        mDatabase.updateChildren(childUpdates);
     }
 
     @Override
@@ -371,6 +301,9 @@ public class DialogFragment extends Fragment
     @Override
     public void onDestroy(){
         super.onDestroy();
-        adapterFB.cleanup();
+        if(adapterFB != null) {
+            adapterFB.cleanup();
+        }
     }
+
 }

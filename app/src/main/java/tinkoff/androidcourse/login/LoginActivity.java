@@ -20,11 +20,15 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 
 import tinkoff.androidcourse.NavigationActivity;
 import tinkoff.androidcourse.R;
 import tinkoff.androidcourse.model.PrefManager;
+import tinkoff.androidcourse.model.db.User;
 import tinkoff.androidcourse.ui.widgets.ProgressButton;
 
 
@@ -40,6 +44,10 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private GoogleApiClient client;
     private SignInButton signInButton;
+
+    private static final String ARG_DIALOG_FRAG = "title";
+
+    private DatabaseReference mDatabase;
 
     /*
     // was in fragment (before mvp)
@@ -77,6 +85,7 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
         });
         //*/
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         //we skip Login check if we already logged
         //TODO: needed more secure check
         //button = (ProgressButton) findViewById(R.id.btn_enter);
@@ -90,6 +99,7 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
             //use raw auth process OR firebase.ui lib
             googleSignIn();
         }
+        //*/
 
     }
 
@@ -99,6 +109,7 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
         return new LoginPresenter();
     }
 
+    /** show default error */
     @Override
     public void showFailedAuth() {
 
@@ -108,6 +119,9 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
         newFragment.show(getSupportFragmentManager(), null);
     }
 
+    /** show error with user's text
+     * @param failText - text to insert into FragmentDialog
+     * */
     @Override
     public void showFailedAuth(String failText) {
 
@@ -117,6 +131,9 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
         newFragment.show(getSupportFragmentManager(), null);
     }
 
+    /** show error with provided id (usually from Presenter)
+     * @param r_id - integer id from R.string.*
+     * */
     @Override
     public void showFailedAuth(int r_id) {
 
@@ -135,13 +152,53 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
     }
 
     @Override
-    public void redirectToNavigation() {
+    public void redirectToNavigation(){
         PrefManager.getInstance().saveLoggedIn(true);
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null) {
+            String username = usernameFromEmail(user.getEmail());
+
+            // write new user
+            writeNewUser(user.getUid(), username, user.getEmail());
+
+            Intent intent = new Intent(this, NavigationActivity.class);
+            intent.putExtra(EXTRA_LOGIN, username);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }else{
+            // didn't find user - log in once again
+            googleSignIn();
+        }
+    }
+
+    @Override
+    public void redirectToNavigation(FirebaseUser user) {
+        PrefManager.getInstance().saveLoggedIn(true);
+
+        String username = usernameFromEmail(user.getEmail());
+
+        // write new user
+        writeNewUser(user.getUid(), username, user.getEmail());
+
         Intent intent = new Intent(this, NavigationActivity.class);
-        intent.putExtra(EXTRA_LOGIN, PrefManager.getInstance().login());
+        intent.putExtra(EXTRA_LOGIN, username);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+    }
+
+    private String usernameFromEmail(String email) {
+        if (email.contains("@")) {
+            return email.split("@")[0]; //left part of email
+        } else {
+            return email;
+        }
+    }
+
+    private void writeNewUser(String userId, String name, String email) {
+        User user = new User(name, email);
+
+        mDatabase.child("users").child(userId).setValue(user);
     }
 
     /*
@@ -171,28 +228,28 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
 
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == G00GLE_SIGN_IN) {
-            if (resultCode == ResultCodes.OK) {
-
-                presenter.onLoginIntoGoogle(data);
-
-                //OR if we use firebase.ui no more checks required
-                //redirectToNavigation();
-            } else {
-                showFailedAuth(getString(R.string.google_signin_intent_failed));
-                googleSignIn();
+            switch (resultCode){
+                case ResultCodes.OK:
+                    presenter.onLoginIntoGoogle(data);
+                    break;
+                case ResultCodes.CANCELED:
+                    showFailedAuth(getString(R.string.google_signin_cancelled));
+                    break;
+                default:
+                    showFailedAuth(getString(R.string.google_signin_intent_failed));
             }
         }
     }
 
     /*
-    * dialog to show in ALL cases of ERRORs
+    * dialog to show in ALL cases of ERRORs here in Login
     * */
     public static class MyDialogFragment extends DialogFragment {
 
         public static MyDialogFragment newInstance(String title) {
             MyDialogFragment frag = new MyDialogFragment();
             Bundle args = new Bundle();
-            args.putString("title", title);
+            args.putString(ARG_DIALOG_FRAG, title);
             frag.setArguments(args);
             return frag;
         }
@@ -200,7 +257,7 @@ public class LoginActivity extends MvpActivity<LoginView, LoginPresenter>
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            String title = getArguments().getString("title");
+            String title = getArguments().getString(ARG_DIALOG_FRAG);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             return builder

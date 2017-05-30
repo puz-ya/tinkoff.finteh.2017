@@ -2,6 +2,7 @@ package tinkoff.androidcourse.login;
 
 import android.app.Activity;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 /**
@@ -14,6 +15,7 @@ public interface LoginView extends MvpView{
 
     // if OK -> showing NavigationActivity
     void redirectToNavigation();
+    void redirectToNavigation(FirebaseUser user);
     // if FAIL -> show error dialog (toast \ snack \ alert)
     void showFailedAuth();  //default text
     void showFailedAuth(String text);

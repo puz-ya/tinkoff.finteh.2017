@@ -112,7 +112,7 @@ public class LoginPresenter extends MvpBasePresenter<LoginView>
 
                                 if (user != null) {
                                     PrefManager.getInstance().saveLogin(user.getDisplayName());
-                                    getView().redirectToNavigation();
+                                    getView().redirectToNavigation(user);
                                 } else {
                                     getView().showFailedAuth(R.string.firebase_user_notfound);
                                 }

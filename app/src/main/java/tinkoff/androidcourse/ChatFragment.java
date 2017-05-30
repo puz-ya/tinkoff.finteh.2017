@@ -27,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,7 +36,6 @@ import tinkoff.androidcourse.firebase.MessagesRepository;
 import tinkoff.androidcourse.firebase.OnTransactionComplete;
 import tinkoff.androidcourse.model.db.DialogItem;
 import tinkoff.androidcourse.model.db.MessageItem;
-import tinkoff.androidcourse.model.db.MessageItem_Table;
 import tinkoff.androidcourse.ui.KeyboardHide;
 import tinkoff.androidcourse.ui.widgets.SendMessageCompoundView;
 
@@ -121,6 +121,7 @@ public class ChatFragment extends Fragment
      * */
     private void addMessageItemToChat(String message){
 
+        /*
         UserInfo userInfo = FirebaseAuth.getInstance().getCurrentUser();
         String uID = "-1";
         if(userInfo != null){
@@ -133,6 +134,7 @@ public class ChatFragment extends Fragment
                 chatId);
 
         updateMessages(messageItem);
+        */
     }
 
     private void initRecyclerChatView(List<MessageItem> dataSet) {
@@ -209,10 +211,12 @@ public class ChatFragment extends Fragment
                     public void onClick(View view) {
 
                         //get dialog's ID from FB adapter and give it to Chat
+                        /*
                         long chatId = adapterFireBchat.getItem(FBpos).getId();
                         Toast.makeText(getActivity(),
                                 getString(R.string.chat_toast_id) + chatId,
                                 Toast.LENGTH_SHORT).show();
+                               */
                     }
                 });
             }
@@ -224,13 +228,15 @@ public class ChatFragment extends Fragment
 
     @NonNull
     private List<MessageItem> getDialogMessageItems() {
+        /*
         List<MessageItem> itemList = SQLite.select()
                 .from(MessageItem.class)
                 .where(MessageItem_Table.id_dialog.is(chatId))
                 .orderBy(MessageItem_Table.creation_time, false)
                 .queryList();
+        */
         //yes, it's redundant, but useful for debug
-        return itemList;
+        return new ArrayList<MessageItem>();
     }
 
     private void updateMessages(final MessageItem message){

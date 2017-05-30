@@ -42,6 +42,7 @@
     <string name="dialog_add_descr_hint">Enter Description</string>
     <string name="dialog_add_button">Add</string>
     <string name="dialog_add_tv_error_text">Error: input texts must be &gt; 3 symbols</string>
+    <string name="dialog_add_userinfo_error">Error: could not get user data</string>
 
     <!-- Chat -->
     <string name="chat_fragment_set_title">Chat-</string>

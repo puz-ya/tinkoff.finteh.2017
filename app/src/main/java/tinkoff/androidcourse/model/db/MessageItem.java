@@ -13,37 +13,24 @@ import java.util.Locale;
  * @author Puzino Yury
  */
 
-@Table(database = FintechChatDatabase.class)
 public class MessageItem {
 
-    @PrimaryKey(autoincrement = true)
-    long id;
+    //all id-s now are Strings
+    String id;
 
-    @Column
     String text;
 
-    @Column
     String id_author;
 
-    @Column
     String id_dialog;
 
-    @Column
     String creation_time;
 
     public MessageItem() {
     }
 
-    public MessageItem(String text, String id_author) {
-        this.text = text;
-        this.id_author = id_author;
-        this.id_dialog = "1"; //common dialog for all "strange" messages
-
-        DateFormat df = new SimpleDateFormat("yyyy.MM.dd | HH:mm:ss", Locale.getDefault());
-        this.creation_time = df.format(Calendar.getInstance().getTime());
-    }
-
-    public MessageItem(String text, String id_author, String id_dialog) {
+    public MessageItem(String id, String text, String id_author, String id_dialog, String creation_time) {
+        this.id = id;
         this.text = text;
         this.id_author = id_author;
         this.id_dialog = id_dialog;
@@ -52,7 +39,7 @@ public class MessageItem {
         this.creation_time = df.format(Calendar.getInstance().getTime());
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
@@ -68,7 +55,7 @@ public class MessageItem {
         return creation_time;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
