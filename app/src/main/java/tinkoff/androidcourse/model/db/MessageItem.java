@@ -29,7 +29,7 @@ public class MessageItem {
     public MessageItem() {
     }
 
-    public MessageItem(String id, String text, String id_author, String id_dialog, String creation_time) {
+    public MessageItem(String id, String id_author, String text, String id_dialog, String creation_time) {
         this.id = id;
         this.text = text;
         this.id_author = id_author;

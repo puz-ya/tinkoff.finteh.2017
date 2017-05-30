@@ -52,10 +52,11 @@ import static tinkoff.androidcourse.App.ARG_MENU_ID;
 import static tinkoff.androidcourse.App.ARG_TITLE;
 
 /** Show list of chat groups */
-public class DialogFragment extends Fragment {
+public class DialogFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Query>
+{
 
     private RecyclerView recyclerView;
-    //private DialogAdapter adapter;
     public FirebaseRecyclerAdapter<DialogItem, DialogAdapter.ViewHolder> adapterFB;
 
     private Button addDialog;
@@ -73,8 +74,6 @@ public class DialogFragment extends Fragment {
     private static final int DELAY_GET_FROM_SOURCE = 3000;
 
     private DatabaseReference mDatabase;
-    private DialogRepository dialogRepository = DialogRepository.getInstance();
-    private Query query;
 
     public DialogFragment(){}
 
@@ -121,27 +120,20 @@ public class DialogFragment extends Fragment {
 
         //start spinning and get the data
         showProgressLoader();
-
-        //set layout to recycler
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
+        getLoaderManager().initLoader(0, null, this);
 
         initRecyclerViewFirebase();
-
-        //hide progress loader (spinning)
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable(){
-            @Override
-            public void run() {
-                hideProgressLoader();
-            }
-        }, DELAY_GET_FROM_SOURCE);
     }
 
     /**
      * get data from firebase & input into adapeter, then into recyclerview
      */
     private void initRecyclerViewFirebase() {
+
+        //set layout to recycler
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+
         // Set up FirebaseRecyclerAdapter with the Query
         Query postsQuery = mDatabase.child("dialogs").limitToFirst(100);
 
@@ -171,25 +163,12 @@ public class DialogFragment extends Fragment {
                         mCallback.startChatScreen(postKey);
                     }
                 });
-
-                /*
-                // Bind Post to ViewHolder, setting OnClickListener for the star button
-                viewHolder.bindToPost(model, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View starView) {
-                        // Need to write to both places the post is stored
-                        DatabaseReference globalPostRef = mDatabase.child("posts").child(postRef.getKey());
-                        DatabaseReference userPostRef = mDatabase.child("user-posts").child(model.uid).child(postRef.getKey());
-
-                        // Run two transactions
-                        onStarClicked(globalPostRef);
-                        onStarClicked(userPostRef);
-                    }
-                });
-                */
             }
         };
         recyclerView.setAdapter(adapterFB);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), layoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
         /** Start DialogAddActivity with "Compound View" to retrieve Title & Description of the new Dialog
@@ -295,15 +274,61 @@ public class DialogFragment extends Fragment {
     }
 
     public void hideProgressLoader(){
-        progress4Dialogs.dismiss();
+        if(progress4Dialogs != null){
+            progress4Dialogs.dismiss();
+        }
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
+
+        progress4Dialogs.dismiss();
         if(adapterFB != null) {
             adapterFB.cleanup();
         }
     }
 
+
+    /** Empty loader for progressDialog */
+
+    @Override
+    public Loader<Query> onCreateLoader(int id, Bundle args) {
+
+        Loader<Query> mLoader = new Loader<Query>(getActivity()){
+            @Override
+            protected void onStartLoading() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(DELAY_GET_FROM_SOURCE);
+                        }catch (InterruptedException ex){
+                            ex.printStackTrace();
+                        }
+                        //useless thing just for loader
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("dialogs");
+                        Query query = ref.orderByChild("creation_time");
+                        deliverResult(query);
+                    }
+                }).start();
+            }
+
+            @Override
+            protected void onStopLoading() {}
+        };
+
+        return mLoader;
+    }
+    @Override
+    public void onLoadFinished(Loader<Query> loader, final Query data) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                hideProgressLoader();
+            }
+        });
+    }
+    @Override
+    public void onLoaderReset(Loader<Query> loader) {}
 }

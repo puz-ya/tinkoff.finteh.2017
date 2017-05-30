@@ -1,104 +1,112 @@
 package tinkoff.androidcourse;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Collections;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import tinkoff.androidcourse.model.db.DialogItem;
 import tinkoff.androidcourse.model.db.MessageItem;
 
 /**
- * Created on 23.03.2017
+ * Created on 30.05.2017
  *
  * @author Puzino Yury
  */
 
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewChatHolder> {
+class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewChatHolder> {
 
-    private LayoutInflater inflater = null;
-    private List<MessageItem> dataset;
-    private OnItemClickListener clickListener;
+    private Context mContext;
+    private DatabaseReference mDatabaseReference;
+    private ChildEventListener mChildEventListener;
+
+    private List<String> messagesIds = new ArrayList<>();
+    private List<MessageItem> messages = new ArrayList<>();
 
     private static final int USER_MESSAGE = 666;
     private static final int OTHERS_MESSAGE = 999;
 
-    public ChatAdapter(List<MessageItem> dataset, OnItemClickListener clickListener) {
-        this.dataset = dataset;
-        this.clickListener = clickListener;
-    }
+    public ChatAdapter(final Context context, DatabaseReference ref) {
+        mContext = context;
+        mDatabaseReference = ref;
 
-    @Override
-    public ChatAdapter.ViewChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // Create child event listener
+        ChildEventListener childEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
 
-        View view = null;
-        inflater = LayoutInflater.from(parent.getContext());
+                // A new message has been added, add it to the displayed list
+                MessageItem messageItem = dataSnapshot.getValue(MessageItem.class);
 
-        //set layout depends on TYPE
-        switch(viewType){
-            case USER_MESSAGE:
-                view = inflater.inflate(R.layout.item_chat_messages_right, parent, false);
-                break;
-            case OTHERS_MESSAGE:
-                view = inflater.inflate(R.layout.item_chat_messages_left, parent, false);
-                break;
-            default:
-                view = inflater.inflate(R.layout.item_chat_messages_left, parent, false);
-                break;
-        }
-
-        return new ChatAdapter.ViewChatHolder(view, clickListener);
-    }
-
-    @Override
-    public void onBindViewHolder(ChatAdapter.ViewChatHolder holder, int position) {
-        holder.text.setText(dataset.get(position).getText());
-        holder.time.setText(dataset.get(position).getCreation_time());
-        holder.userId.setText(String.format(Locale.getDefault(),"%s", dataset.get(position).getId_author()) );
-    }
-
-    @Override
-    public int getItemCount() {
-        return dataset.size();
-    }
-
-    public void setItems(List<MessageItem> messageItems) {
-        dataset = messageItems;
-        notifyDataSetChanged();
-    }
-
-    public void addMessage(MessageItem messageItem) {
-        dataset.add(0, messageItem);
-        notifyItemInserted(0);
-    }
-
-    /* get correct type based on User
-    * in version with local DB users was not defined, so it was only 1 user with id == "1"
-    * */
-    @Override
-    public int getItemViewType(int position) {
-
-        MessageItem messageItem = dataset.get(position);
-
-        if (messageItem != null){
-            if(messageItem.getId_author().equals("1")){
-                return USER_MESSAGE;
+                // Update RecyclerView
+                messagesIds.add(dataSnapshot.getKey());
+                messages.add(messageItem);
+                notifyItemInserted(messages.size() - 1);
             }
-            return OTHERS_MESSAGE;
-        }
 
-        return super.getItemViewType(position);
-    }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
 
-    @Override
-    public long getItemId(int position) {
-        //todo: delete or refactor
-        return Integer.valueOf(dataset.get(position).getId_author());
+                // A message has changed, use the key to determine if we are displaying this message
+                MessageItem newMessage = dataSnapshot.getValue(MessageItem.class);
+                String messageKey = dataSnapshot.getKey();
+
+                int messageIndex = messagesIds.indexOf(messageKey);
+                if (messageIndex > -1) {
+                    // Replace with the new data
+                    messages.set(messageIndex, newMessage);
+
+                    // Update the RecyclerView
+                    notifyItemChanged(messageIndex);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                // A message has changed, use the key to determine if we are displaying this message and if so remove it
+                String messageKey = dataSnapshot.getKey();
+
+                int messageIndex = messagesIds.indexOf(messageKey);
+                if (messageIndex > -1) {
+                    // Remove data from the list
+                    messagesIds.remove(messageIndex);
+                    messages.remove(messageIndex);
+
+                    // Update the RecyclerView
+                    notifyItemRemoved(messageIndex);
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+
+                // A message has changed position, use the key to determine if we are
+                // displaying this message and if so move it.
+                MessageItem movedMessage = dataSnapshot.getValue(MessageItem.class);
+                String messageKey = dataSnapshot.getKey();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+        ref.addChildEventListener(childEventListener);
+
+        // Store reference to listener so it can be removed on app stop
+        mChildEventListener = childEventListener;
     }
 
     public static class ViewChatHolder extends RecyclerView.ViewHolder {
@@ -161,4 +169,60 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewChatHolder
             });
         }
     }
+
+    @Override
+    public void onBindViewHolder(ViewChatHolder holder, int position) {
+        holder.text.setText(messages.get(position).getText());
+        holder.time.setText(messages.get(position).getCreation_time());
+        holder.userId.setText(String.format(Locale.getDefault(),"%s", messages.get(position).getId_author()) );
+    }
+
+    @Override
+    public ViewChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        View view = null;
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+
+        //set layout depends on TYPE
+        switch(viewType){
+            case USER_MESSAGE:
+                view = inflater.inflate(R.layout.item_chat_messages_right, parent, false);
+                break;
+            case OTHERS_MESSAGE:
+                view = inflater.inflate(R.layout.item_chat_messages_left, parent, false);
+                break;
+            default:
+                view = inflater.inflate(R.layout.item_chat_messages_left, parent, false);
+                break;
+        }
+        return new ViewChatHolder(view);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        // Simply returning an integer to use in onCreateViewHolder.
+        FirebaseUser userInfo = FirebaseAuth.getInstance().getCurrentUser();
+        MessageItem messageItem = messages.get(position);
+        if (userInfo != null){
+            if (messageItem.getId().equals(userInfo.getUid())){
+                return USER_MESSAGE;
+            }else{
+                return OTHERS_MESSAGE;
+            }
+        }
+        return OTHERS_MESSAGE;
+    }
+
+    @Override
+    public int getItemCount() {
+        return messages.size();
+    }
+
+    public void cleanupListener() {
+        if (mChildEventListener != null) {
+            mDatabaseReference.removeEventListener(mChildEventListener);
+        }
+    }
+
+
 }
